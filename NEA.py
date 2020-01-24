@@ -1,4 +1,4 @@
-#NEA hello world
+#NEA
 #First draft for finding all possible bus routes between any two points
 import time
 def StartUp():
