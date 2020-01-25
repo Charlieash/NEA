@@ -8,12 +8,12 @@ def StartUp():
             Info.append(row)
     StartLocation = Info[0] #Get the starting location for the bus
     EndLocation = Info[1] #Get the end location for the bus
-    EndTime = Info[2] #Get the wanted arrival time
-    Endtime = EndTime.split(":")
-    StartTime = []
-    StartTime.append(int(Endtime[0])-1) #no one wants to be on a bus for longer than an hour
-    StartTime.append(Endtime[1])
-    StartTime = str(StartTime[0])+ ":" + str(StartTime[1]) 
+    StartTime = Info[2] #Get the wanted arrival time
+    StartTime = StartTime.split(":")
+    EndTime = []
+    EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
+    EndTime.append(StartTime[1])
+    EndTime = str(EndTime[0])+ ":" + str(EndTime[1]) 
     return(StartLocation, EndLocation, StartTime, EndTime)
 def ConnectToDatabase():
     import mysql.connector
