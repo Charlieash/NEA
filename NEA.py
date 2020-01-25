@@ -56,11 +56,11 @@ def MultipleBusses(routes, TimeRange, OneBus,TimeStart, TimeEnd):
         results.append(routesinTime)
         reference.append(List[i])
     
-Thing = StartUp()
+DataInput = StartUp()
 #with open("It_works.txt","w") as Huh: #Test to see if php runs this script 
     #Huh.write("Thing")
 time.sleep(5)
-TimeStart = Thing[2]
-TimeEnd = Thing[3]
-EndLocation = Thing[1]
-StartLocation = Thing[0]
+TimeStart = DataInput[2]
+TimeEnd = DataInput[3]
+EndLocation = DataInput[1]
+StartLocation = DataInput[0]
