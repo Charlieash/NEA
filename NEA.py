@@ -9,7 +9,13 @@ def StartUp():
     StartLocation = Info[0] #Get the starting location for the bus
     EndLocation = Info[1] #Get the end location for the bus
     StartTime = Info[2] #Get the wanted arrival time
+    if ":" not in StartTime:
+        return("Error")
     StartTime = StartTime.split(":")
+    try:
+        int(StartTime[0]) + int(StartTime[1])
+    except:
+        return("Error")
     EndTime = []
     EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
     EndTime.append(StartTime[1])
