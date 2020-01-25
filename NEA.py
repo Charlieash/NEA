@@ -13,7 +13,9 @@ def StartUp():
         return("Error")
     StartTime = StartTime.split(":")
     try:
-        int(StartTime[0]) + int(StartTime[1])
+        errorCatch = int(StartTime[0]) + int(StartTime[1])
+        if StartTime[0] > 23 or StartTime[0] < 00 or StartTime[1] > 59 or StartTime[1]<00:
+            return("Error")
     except:
         return("Error")
     EndTime = []
