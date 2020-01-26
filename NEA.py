@@ -48,7 +48,7 @@ def StartUp():
     EndLocation = Info[1] #Get the end location for the bus
     StartTime = Info[2] #Get the wanted arrival time
     Error = error(StartTime, StartLocation, EndLocation)
-    if Error == "error":
+    if Error == "Error":
         ErrorCaught()
     EndTime = []
     EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
