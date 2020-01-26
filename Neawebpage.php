@@ -45,6 +45,9 @@
   $fp = fopen('data.txt', 'a');
   fwrite($fp, $data);
   fclose($fp);
-  exec("NEA.py");
+  $output = exec("NEA.py");
+  }
+  if($output = "Error"){
+      header(Location: "Error.php")
   }
   ?>
