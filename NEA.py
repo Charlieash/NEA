@@ -12,20 +12,15 @@ def ConnectToDatabase():
     mycursor = mydb.cursor()
     return(mycursor)
 
-def StartUp():
-    Info = []
+
+
+def error(StartTime, StartLocation, EndLocation):
     #Stops = []
-    with open("data.txt","r") as File:
-        for row in File:
-            Info.append(row)
     #myCursor = ConnectToDatabase()
     #myCursor.execute("SELECT StopName FROM Stop")
     #for i in range(len(myCursor)):
         #Stops.append(myCursor[i])
-    StartLocation = Info[0] #Get the starting location for the bus
-    EndLocation = Info[1] #Get the end location for the bus
-    StartTime = Info[2] #Get the wanted arrival time
-    #if StartLocation not in Stops or EndLocation not in Stops:
+        #if StartLocation not in Stops or EndLocation not in Stops:
         #return("Error")
     if ":" not in StartTime:
         return("Error")
@@ -36,11 +31,32 @@ def StartUp():
             return("Error")
     except:
         return("Error")
+
+
+
+def ErrorCaught():
+    #Send html to error page
+    return("error")
+
+
+def StartUp():
+    Info = []
+    with open("data.txt","r") as File:
+        for row in File:
+            Info.append(row)
+    StartLocation = Info[0] #Get the starting location for the bus
+    EndLocation = Info[1] #Get the end location for the bus
+    StartTime = Info[2] #Get the wanted arrival time
+    Error = error(StartTime, StartLocation, EndLocation)
+    if Error == "error":
+        ErrorCaught()
     EndTime = []
     EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
     EndTime.append(StartTime[1])
     EndTime = str(EndTime[0])+ ":" + str(EndTime[1]) 
     return(StartLocation, EndLocation, StartTime, EndTime)
+
+
 
 def TimeRange(TimeStart, TimeEnd, StartLocation):
     Routes = []
@@ -51,6 +67,8 @@ def TimeRange(TimeStart, TimeEnd, StartLocation):
     print(Routes)
     return(Routes)
 
+
+
 def OneBus(routes, EndLocation, StartLocation, TimeStart, TimeEnd):
     RoutesInTime=[]
     myCursor = ConnectToDatabase()
@@ -59,6 +77,8 @@ def OneBus(routes, EndLocation, StartLocation, TimeStart, TimeEnd):
         myCursor.execute("SELECT RouteId FROM times WHERE StopId = {} AND RouteId = {} AND Time>{}").format(EndLocation,routes[u],Times) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
         RoutesInTime.append(myCursor) #appends the final product to a list
     return(RoutesInTime) 
+
+
 
 def MultipleBusses(routes,TimeStart, TimeEnd):
     List = routes
@@ -72,7 +92,9 @@ def MultipleBusses(routes,TimeStart, TimeEnd):
         routesinTime= OneBus(routes, EndLocation, StartLocation, TimeStart, TimeEnd)
         results.append(routesinTime)
         reference.append(List[i])
-    
+
+
+
 DataInput = StartUp()
 #with open("It_works.txt","w") as Huh: #Test to see if php runs this script 
     #Huh.write("Thing")
