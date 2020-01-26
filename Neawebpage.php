@@ -47,7 +47,7 @@
   fclose($fp);
   $output = exec("NEA.py");
   }
-  if($output = "Error"){
+  if($read == "Error"){
       header(Location: "Error.php")
   }
   ?>

@@ -35,7 +35,7 @@ def error(StartTime, StartLocation, EndLocation):
 
 
 def ErrorCaught():
-    #Send html to error page
+    print("Error")
     return("error")
 
 
