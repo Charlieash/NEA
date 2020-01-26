@@ -24,7 +24,6 @@ def error(StartTime, StartLocation, EndLocation):
         #return("Error")
     if ":" not in StartTime:
         return("Error")
-    StartTime = StartTime.split(":")
     try:
         errorCatch = int(StartTime[0]) + int(StartTime[1])
         if StartTime[0] > 23 or StartTime[0] < 00 or StartTime[1] > 59 or StartTime[1]<00:
@@ -48,6 +47,7 @@ def StartUp():
     EndLocation = Info[1] #Get the end location for the bus
     StartTime = Info[2] #Get the wanted arrival time
     Error = error(StartTime, StartLocation, EndLocation)
+    StartTime = StartTime.split(":")
     if Error == "Error":
         ErrorCaught()
     EndTime = []
