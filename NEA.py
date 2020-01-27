@@ -22,11 +22,9 @@ def error(StartTime, StartLocation, EndLocation):
         #Stops.append(myCursor[i])
         #if StartLocation not in Stops or EndLocation not in Stops:
         #return("Error")
-    if ":" not in StartTime:
-        return("Error")
     try:
         errorCatch = int(StartTime[0]) + int(StartTime[1])
-        if StartTime[0] > 23 or StartTime[0] < 00 or StartTime[1] > 59 or StartTime[1]<00:
+        if int(StartTime[0]) > 23 or int(StartTime[0]) < 00 or int(StartTime[1]) > 59 or int(StartTime[1])<00:
             return("Error")
     except:
         return("Error")
@@ -46,8 +44,10 @@ def StartUp():
     StartLocation = Info[0] #Get the starting location for the bus
     EndLocation = Info[1] #Get the end location for the bus
     StartTime = Info[2] #Get the wanted arrival time
-    Error = error(StartTime, StartLocation, EndLocation)
+    if ":" not in StartTime:
+        ErrorCaught()
     StartTime = StartTime.split(":")
+    Error = error(StartTime, StartLocation, EndLocation)
     if Error == "Error":
         ErrorCaught()
     EndTime = []
