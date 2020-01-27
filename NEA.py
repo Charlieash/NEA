@@ -49,7 +49,6 @@ def error(StartTime, StartLocation, EndLocation):
         return("Error")
 
 
-
 def ErrorCaught():
     print("Error")
     return("error")
