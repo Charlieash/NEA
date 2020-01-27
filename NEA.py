@@ -82,8 +82,7 @@ def TimeRange(TimeStart, TimeEnd, StartLocation):
     Routes = []
     myCursor = ConnectToDatabase()
     myCursor.execute("SELECT RouteId FROM times WHERE Time > {} AND Time < {} AND StopId = {}").format(TimeStart,TimeEnd,StartLocation)  #searches the databases for all routes leaving the given stop within the time range
-    for i in range(len(myCursor)):
-        Routes.append(myCursor[i])
+    Routes = myCursor.fetchall()
     print(Routes)
     return(Routes)
 
@@ -95,7 +94,7 @@ def OneBus(routes, EndLocation, StartLocation, TimeStart, TimeEnd):
     for u in range(len(routes)):
         Times = myCursor.execute("SELECT Time from times WHERE StopId = {} AND RouteID = {} AND Time > {} AND Time < {}").format(StartLocation,routes[u], TimeStart, TimeEnd) #Finds the time range
         myCursor.execute("SELECT RouteId FROM times WHERE StopId = {} AND RouteId = {} AND Time>{}").format(EndLocation,routes[u],Times) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
-        RoutesInTime.append(myCursor) #appends the final product to a list
+        RoutesInTime = myCursor.fetchall() #appends the final product to a list
     return(RoutesInTime) 
 
 
@@ -107,7 +106,7 @@ def MultipleBusses(routes,TimeStart, TimeEnd):
     myCursor = ConnectToDatabase()
     for i in range(len(List)):
         myCursor.execute("SELECT StopId FROM times WHERE RouteId = {}").format(List[i])
-        StartLocation = myCursor
+        StartLocation = myCursor.fetchall()
         routes = TimeRange(TimeStart,TimeEnd,StartLocation)
         routesinTime= OneBus(routes, EndLocation, StartLocation, TimeStart, TimeEnd)
         results.append(routesinTime)
