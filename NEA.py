@@ -15,13 +15,13 @@ def ConnectToDatabase():
 
 
 def error(StartTime, StartLocation, EndLocation):
-    #Stops = []
-    #myCursor = ConnectToDatabase()
-    #myCursor.execute("SELECT StopName FROM Stop")
-    #for i in range(len(myCursor)):
-        #Stops.append(myCursor[i])
-        #if StartLocation not in Stops or EndLocation not in Stops:
-        #return("Error")
+    Stops = []
+    myCursor = ConnectToDatabase()
+    myCursor.execute("SELECT StopName FROM stop")
+    for i in range(len(myCursor)):
+        Stops.append(myCursor[i])
+        if StartLocation not in Stops or EndLocation not in Stops:
+            return("Error")
     try:
         errorCatch = int(StartTime[0]) + int(StartTime[1])
         if int(StartTime[0]) > 23 or int(StartTime[0]) < 00 or int(StartTime[1]) > 59 or int(StartTime[1])<00:
