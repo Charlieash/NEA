@@ -7,7 +7,7 @@
         <h1 style ="font-size: 900%; text-align: center; "> Error</h1>
         <h2 style = "font-size: 400%; text-align: center;">You have submitted an incorrect value </h2>
         <form method = "POST" style = "text-align:center">
-            <button class = "btn success" name = return >
+            <button class = "btn success" name = return >Continue </button>
 </form>
 </body>
 </html>
