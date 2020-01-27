@@ -1,8 +1,8 @@
 #NEA
 #First draft for finding all possible bus routes between any two points
 import time
+import mysql.connector
 def ConnectToDatabase():
-    import mysql.connector
     mydb = mysql.connector.connect(
         host="localhost",                    #connects to the database
         user="root",
@@ -15,21 +15,37 @@ def ConnectToDatabase():
 
 
 def error(StartTime, StartLocation, EndLocation):
-    #Stops = []
-    #myCursor = ConnectToDatabase()
-    #print("1")
-    #myCursor.execute("SELECT StopName FROM stop")
-    #print("2")
-    #for i in range(len(myCursor)):
-     #   print("3")
-      #  Stops.append(myCursor[i])
-       # if StartLocation not in Stops or EndLocation not in Stops:
-        #    return("Error")
+    StartLocation = StartLocation.strip()
+    EndLocation =EndLocation.strip()
+    count = 0
+    mydb = mysql.connector.connect(
+        host="localhost",                    #connects to the database
+        user="root",
+        passwd="LucieLeia0804",
+        database="mydb",
+        )
+    myCursor = mydb.cursor()
+    myCursor.execute("SELECT StopName FROM stop")
+    Stops = myCursor.fetchall()
+    print(Stops)
+    print(StartLocation)
+    print(EndLocation)
+    
+    for i in range(len(Stops)):
+        print(Stops[i])       
+        if StartLocation == (Stops[i][0]) or EndLocation ==(Stops[i][0]):
+            count = count+1
+        print(count)
+    if count != 2:
+        print("1")
+        return("Error")
     try:
         errorCatch = int(StartTime[0]) + int(StartTime[1])
         if int(StartTime[0]) > 23 or int(StartTime[0]) < 00 or int(StartTime[1]) > 59 or int(StartTime[1])<00:
+            print("2")
             return("Error")
     except:
+        print("3")
         return("Error")
 
 
@@ -53,6 +69,7 @@ def StartUp():
     Error = error(StartTime, StartLocation, EndLocation)
     if Error == "Error":
         ErrorCaught()
+        return(Error)
     EndTime = []
     EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
     EndTime.append(StartTime[1])
