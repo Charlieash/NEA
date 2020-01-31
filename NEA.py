@@ -27,25 +27,17 @@ def error(StartTime, StartLocation, EndLocation):
     myCursor = mydb.cursor()
     myCursor.execute("SELECT StopName FROM stop")
     Stops = myCursor.fetchall()
-    print(Stops)
-    print(StartLocation)
-    print(EndLocation)
     
-    for i in range(len(Stops)):
-        print(Stops[i])       
+    for i in range(len(Stops)):     
         if StartLocation == (Stops[i][0]) or EndLocation ==(Stops[i][0]):
             count = count+1
-        print(count)
     if count != 2:
-        print("1")
         return("Error")
     try:
         errorCatch = int(StartTime[0]) + int(StartTime[1])
         if int(StartTime[0]) > 23 or int(StartTime[0]) < 00 or int(StartTime[1]) > 59 or int(StartTime[1])<00:
-            print("2")
             return("Error")
     except:
-        print("3")
         return("Error")
 
 
@@ -78,9 +70,23 @@ def StartUp():
 
 
 def TimeRange(TimeStart, TimeEnd, StartLocation):
-    Routes = []
-    myCursor = ConnectToDatabase()
-    myCursor.execute("SELECT RouteId FROM times WHERE Time > {} AND Time < {} AND StopId = {}").format(TimeStart,TimeEnd,StartLocation)  #searches the databases for all routes leaving the given stop within the time range
+    mydb = mysql.connector.connect(
+        host="localhost",                    #connects to the database
+        user="root",
+        passwd="LucieLeia0804",
+        database="mydb",
+        )
+    myCursor = mydb.cursor()
+    TimeStart = TimeStart[0] +":"+ TimeStart[1]
+    TimeStart = TimeStart.rstrip()
+    TimeEnd = TimeEnd.rstrip()
+    StartLocation = StartLocation.rstrip()
+    myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(StartLocation))
+    LocationId = myCursor.fetchall()
+    LocationId = str(LocationId[0]).replace(",","")
+    LocationId = str(LocationId).replace("(","")
+    LocationId = str(LocationId).replace(")","")
+    myCursor.execute(("""SELECT Routeid FROM times WHERE Time > '%s' AND Time < '%s' AND StopID = '%s'""")%(TimeStart ,TimeEnd ,LocationId))  #searches the databases for all routes leaving the given stop within the time range
     Routes = myCursor.fetchall()
     print(Routes)
     return(Routes)
@@ -121,3 +127,4 @@ TimeStart = DataInput[2]
 TimeEnd = DataInput[3]
 EndLocation = DataInput[1]
 StartLocation = DataInput[0]
+routes = TimeRange(TimeStart, TimeEnd, StartLocation)
