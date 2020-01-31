@@ -69,7 +69,7 @@ def StartUp():
     StartTime = StartTime.rstrip()
     EndTime = EndTime.rstrip()
     StartLocation = StartLocation.rstrip()
-    Location = LocationId()
+    Location = LocationId(StartLocation, EndLocation)
     StartLocationId= Location[0]
     EndLocationId = Location[1]
     return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
@@ -94,7 +94,7 @@ def LocationId(StartLocation, EndLocation):
     EndLocationId = str(EndLocationId).replace(")","") 
     return(StartLocationId, EndLocationId)
 
-def TimeRange(TimeStart, TimeEnd, StartLocation, StartLocationId):
+def TimeRange(TimeStart, TimeEnd, StartLocationId):
     mydb = mysql.connector.connect(
         host="localhost",                    #connects to the database
         user="root",
@@ -111,7 +111,7 @@ def TimeRange(TimeStart, TimeEnd, StartLocation, StartLocationId):
 
 def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
     RoutesInTime=[]
-     mydb = mysql.connector.connect(
+    mydb = mysql.connector.connect(
         host="localhost",                    #connects to the database
         user="root",
         passwd="LucieLeia0804",
@@ -126,18 +126,20 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
 
 
 
-def MultipleBusses(routes,TimeStart, TimeEnd):
+def MultipleBusses(routes,TimeStart, TimeEnd, results):
     List = routes
-    results = []
     reference = []
     myCursor = ConnectToDatabase()
     for i in range(len(List)):
         myCursor.execute("SELECT StopId FROM times WHERE RouteId = {}").format(List[i])
         StartLocation = myCursor.fetchall()
-        routes = TimeRange(TimeStart,TimeEnd,StartLocation)
-        routesinTime= OneBus(routes, EndLocation, StartLocation, TimeStart, TimeEnd)
+        Location = LocationId(StartLocation, EndLocation)
+        StartLocationId=Location[0]
+        routes = TimeRange(TimeStart, TimeEnd, StartLocationId)
+        routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId)
         results.append(routesinTime)
         reference.append(List[i])
+    return(results, reference)
 
 
 
@@ -151,5 +153,6 @@ EndLocation = DataInput[1]
 StartLocation = DataInput[0]
 StartLocationId = DataInput[4]
 EndLocationId = DataInput[5]
-routes = TimeRange(TimeStart, TimeEnd, StartLocation)
-OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId)
+routes = TimeRange(TimeStart, TimeEnd, StartLocationId)
+results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId)
+results = MultipleBusses(routes,TimeStart, TimeEnd, results)
