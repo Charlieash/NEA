@@ -64,12 +64,17 @@ def StartUp():
     EndTime = []
     EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
     EndTime.append(StartTime[1])
-    EndTime = str(EndTime[0])+ ":" + str(EndTime[1]) 
-    return(StartLocation, EndLocation, StartTime, EndTime)
+    EndTime = str(EndTime[0])+ ":" + str(EndTime[1])
+    StartTime = StartTime[0] +":"+ StartTime[1]
+    StartTime = StartTime.rstrip()
+    EndTime = EndTime.rstrip()
+    StartLocation = StartLocation.rstrip()
+    Location = LocationId()
+    StartLocationId= Location[0]
+    EndLocationId = Location[1]
+    return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
 
-
-
-def TimeRange(TimeStart, TimeEnd, StartLocation):
+def LocationId(StartLocation, EndLocation):
     mydb = mysql.connector.connect(
         host="localhost",                    #connects to the database
         user="root",
@@ -77,28 +82,45 @@ def TimeRange(TimeStart, TimeEnd, StartLocation):
         database="mydb",
         )
     myCursor = mydb.cursor()
-    TimeStart = TimeStart[0] +":"+ TimeStart[1]
-    TimeStart = TimeStart.rstrip()
-    TimeEnd = TimeEnd.rstrip()
-    StartLocation = StartLocation.rstrip()
     myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(StartLocation))
-    LocationId = myCursor.fetchall()
-    LocationId = str(LocationId[0]).replace(",","")
-    LocationId = str(LocationId).replace("(","")
-    LocationId = str(LocationId).replace(")","")
-    myCursor.execute(("""SELECT Routeid FROM times WHERE Time > '%s' AND Time < '%s' AND StopID = '%s'""")%(TimeStart ,TimeEnd ,LocationId))  #searches the databases for all routes leaving the given stop within the time range
+    StartLocationId = myCursor.fetchall()
+    StartLocationId = str(StartLocationId[0]).replace(",","")
+    StartLocationId = str(StartLocationId).replace("(","")
+    StartLocationId = str(StartLocationId).replace(")","") 
+    myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(EndLocation))
+    EndLocationId = myCursor.fetchall()
+    EndLocationId = str(EndLocation[0]).replace(",","")
+    EndLocationId = str(EndLocationId).replace("(","")
+    EndLocationId = str(EndLocationId).replace(")","") 
+    return(StartLocationId, EndLocationId)
+
+def TimeRange(TimeStart, TimeEnd, StartLocation, StartLocationId):
+    mydb = mysql.connector.connect(
+        host="localhost",                    #connects to the database
+        user="root",
+        passwd="LucieLeia0804",
+        database="mydb",
+        )
+    myCursor = mydb.cursor()
+    myCursor.execute(("""SELECT Routeid FROM times WHERE Time > '%s' AND Time < '%s' AND StopID = '%s'""")%(TimeStart ,TimeEnd ,StartLocationId))  #searches the databases for all routes leaving the given stop within the time range
     Routes = myCursor.fetchall()
     print(Routes)
     return(Routes)
 
 
 
-def OneBus(routes, EndLocation, StartLocation, TimeStart, TimeEnd):
+def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
     RoutesInTime=[]
-    myCursor = ConnectToDatabase()
+     mydb = mysql.connector.connect(
+        host="localhost",                    #connects to the database
+        user="root",
+        passwd="LucieLeia0804",
+        database="mydb",
+        )
+    myCursor = mydb.cursor()
     for u in range(len(routes)):
-        Times = myCursor.execute("SELECT Time from times WHERE StopId = {} AND RouteID = {} AND Time > {} AND Time < {}").format(StartLocation,routes[u], TimeStart, TimeEnd) #Finds the time range
-        myCursor.execute("SELECT RouteId FROM times WHERE StopId = {} AND RouteId = {} AND Time>{}").format(EndLocation,routes[u],Times) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
+        Times = myCursor.execute("SELECT Time from times WHERE StopId = {} AND RouteID = {} AND Time > {} AND Time < {}").format(StartLocationId,routes[u], TimeStart, TimeEnd) #Finds the time range
+        myCursor.execute("SELECT RouteId FROM times WHERE StopId = {} AND RouteId = {} AND Time>{}").format(EndLocationId,routes[u],Times) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
         RoutesInTime = myCursor.fetchall() #appends the final product to a list
     return(RoutesInTime) 
 
@@ -127,4 +149,7 @@ TimeStart = DataInput[2]
 TimeEnd = DataInput[3]
 EndLocation = DataInput[1]
 StartLocation = DataInput[0]
+StartLocationId = DataInput[4]
+EndLocationId = DataInput[5]
 routes = TimeRange(TimeStart, TimeEnd, StartLocation)
+OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId)
