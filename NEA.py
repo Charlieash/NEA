@@ -2,6 +2,7 @@
 #First draft for finding all possible bus routes between any two points
 import time
 import mysql.connector
+import datetime
 def ConnectToDatabase():
     mydb = mysql.connector.connect(
         host="localhost",                    #connects to the database
@@ -69,6 +70,7 @@ def StartUp():
     StartTime = StartTime.rstrip()
     EndTime = EndTime.rstrip()
     StartLocation = StartLocation.rstrip()
+    EndLocation = EndLocation.rstrip()
     Location = LocationId(StartLocation, EndLocation)
     StartLocationId= Location[0]
     EndLocationId = Location[1]
@@ -87,11 +89,13 @@ def LocationId(StartLocation, EndLocation):
     StartLocationId = str(StartLocationId[0]).replace(",","")
     StartLocationId = str(StartLocationId).replace("(","")
     StartLocationId = str(StartLocationId).replace(")","") 
+    StartLocationId = int(StartLocationId)
     myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(EndLocation))
     EndLocationId = myCursor.fetchall()
-    EndLocationId = str(EndLocation[0]).replace(",","")
+    EndLocationId = str(EndLocationId[0]).replace(",","")
     EndLocationId = str(EndLocationId).replace("(","")
     EndLocationId = str(EndLocationId).replace(")","") 
+    EndLocationId = int(EndLocationId)
     return(StartLocationId, EndLocationId)
 
 def TimeRange(TimeStart, TimeEnd, StartLocationId):
@@ -104,9 +108,23 @@ def TimeRange(TimeStart, TimeEnd, StartLocationId):
     myCursor = mydb.cursor()
     myCursor.execute(("""SELECT Routeid FROM times WHERE Time > '%s' AND Time < '%s' AND StopID = '%s'""")%(TimeStart ,TimeEnd ,StartLocationId))  #searches the databases for all routes leaving the given stop within the time range
     Routes = myCursor.fetchall()
+    for i in range(len(Routes)):
+        Routes[i] = str(Routes[i][0]).replace(",","")
+        Routes[i] = str(Routes[i]).replace("(","")
+        Routes[i] = str(Routes[i]).replace(")","")
+        Routes[i] = int(Routes[i])
     print(Routes)
     return(Routes)
 
+def convert_timedelta(Times):
+    days, seconds = Times.days, Times.seconds
+    hours = days * 24 + seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = (seconds % 60)
+    return hours, minutes, seconds
+    td = datetime.timedelta(2, 7743, 12345)
+    hours, minutes, seconds = convert_timedelta(td)
+    print ('{} minutes, {} hours'.format(minutes, hours))
 
 
 def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
@@ -119,8 +137,13 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
         )
     myCursor = mydb.cursor()
     for u in range(len(routes)):
-        Times = myCursor.execute("SELECT Time from times WHERE StopId = {} AND RouteID = {} AND Time > {} AND Time < {}").format(StartLocationId,routes[u], TimeStart, TimeEnd) #Finds the time range
-        myCursor.execute("SELECT RouteId FROM times WHERE StopId = {} AND RouteId = {} AND Time>{}").format(EndLocationId,routes[u],Times) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
+        myCursor.execute(("SELECT Time from times WHERE StopId = '{}' AND RouteID = '{}' AND Time > '{}' AND Time < '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd)) #Finds the time range
+        Times = myCursor.fetchall()
+        Times = str(Times[0]).replace(",","")
+        Times = str(Times).replace("(","")
+        Times = str(Times).replace(")","") 
+        convert_timedelta(Times)
+        myCursor.execute(("SELECT RouteId FROM times WHERE StopId = {} AND RouteId = {} AND Time>{}").format(EndLocationId,routes[u],Times)) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
         RoutesInTime = myCursor.fetchall() #appends the final product to a list
     return(RoutesInTime) 
 
