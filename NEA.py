@@ -2,7 +2,7 @@
 #First draft for finding all possible bus routes between any two points
 import time
 import mysql.connector
-import datetime
+from datetime import datetime
 def ConnectToDatabase():
     mydb = mysql.connector.connect(
         host="localhost",                    #connects to the database
@@ -83,6 +83,9 @@ def LocationId(StartLocation, EndLocation):
         passwd="LucieLeia0804",
         database="mydb",
         )
+    StartLocation = str(StartLocation).replace(",","")
+    StartLocation = str(StartLocation).replace("(","")
+    StartLocation = str(StartLocation).replace(")","") 
     myCursor = mydb.cursor()
     myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(StartLocation))
     StartLocationId = myCursor.fetchall()
@@ -116,16 +119,6 @@ def TimeRange(TimeStart, TimeEnd, StartLocationId):
     print(Routes)
     return(Routes)
 
-def convert_timedelta(Times):
-    days, seconds = Times.days, Times.seconds
-    hours = days * 24 + seconds // 3600
-    minutes = (seconds % 3600) // 60
-    seconds = (seconds % 60)
-    return hours, minutes, seconds
-    td = datetime.timedelta(2, 7743, 12345)
-    hours, minutes, seconds = convert_timedelta(td)
-    print ('{} minutes, {} hours'.format(minutes, hours))
-
 
 def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
     RoutesInTime=[]
@@ -142,7 +135,6 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
         Times = str(Times[0]).replace(",","")
         Times = str(Times).replace("(","")
         Times = str(Times).replace(")","") 
-        convert_timedelta(Times)
         myCursor.execute(("SELECT RouteId FROM times WHERE StopId = {} AND RouteId = {} AND Time>{}").format(EndLocationId,routes[u],Times)) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
         RoutesInTime = myCursor.fetchall() #appends the final product to a list
     return(RoutesInTime) 
@@ -150,13 +142,18 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
 
 
 def MultipleBusses(routes,TimeStart, TimeEnd, results):
+    mydb = mysql.connector.connect(
+        host="localhost",                    #connects to the database
+        user="root",
+        passwd="LucieLeia0804",
+        database="mydb",
+        )
+    myCursor = mydb.cursor()
     List = routes
     reference = []
-    myCursor = ConnectToDatabase()
     for i in range(len(List)):
-        myCursor.execute("SELECT StopId FROM times WHERE RouteId = {}").format(List[i])
-        StartLocation = myCursor.fetchall()
-        Location = LocationId(StartLocation, EndLocation)
+        myCursor.execute(("SELECT StopId FROM times WHERE RouteId = {}").format(List[i]))
+        StartLocationId = myCursor.fetchall()
         StartLocationId=Location[0]
         routes = TimeRange(TimeStart, TimeEnd, StartLocationId)
         routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId)
