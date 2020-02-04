@@ -153,13 +153,19 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results):
     reference = []
     for i in range(len(List)):
         myCursor.execute(("SELECT StopId FROM times WHERE RouteId = {}").format(List[i]))
-        StartLocationId = myCursor.fetchall()
-        StartLocationId=Location[0]
-        routes = TimeRange(TimeStart, TimeEnd, StartLocationId)
-        routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId)
-        results.append(routesinTime)
-        reference.append(List[i])
-    return(results, reference)
+        Stops = myCursor.fetchall()
+        for u in range(len(Stops)):
+            StartLocationId=Stops[u]
+            Routes.append(Stops[u])
+            route = TimeRange(TimeStart, TimeEnd, StartLocationId)
+            for o in range(len(Routes)):
+                if Routes[o]== Stops[u]:
+                    Routes[o].append(route)
+        for k in range(len(Routes)):
+            routes = Routes[k]
+            routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId)
+            results.append(routesinTime)
+    return(results, results)
 
 
 
