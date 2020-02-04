@@ -150,7 +150,7 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results):
         )
     myCursor = mydb.cursor()
     List = routes
-    reference = []
+    Routes = []
     for i in range(len(List)):
         myCursor.execute(("SELECT StopId FROM times WHERE RouteId = {}").format(List[i]))
         Stops = myCursor.fetchall()
