@@ -13,8 +13,12 @@ def ConnectToDatabase():
     mycursor = mydb.cursor()
     return(mycursor)
 
-
-
+def format(variable):
+        variable = myCursor.fetchall()
+        variable = str(variable).replace(",","")
+        variable = str(variable).replace("(","")
+        variable = str(variable).replace(")","") 
+    return(variable)
 def error(StartTime, StartLocation, EndLocation):
     StartLocation = StartLocation.strip()
     EndLocation =EndLocation.strip()
