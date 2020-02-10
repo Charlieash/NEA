@@ -134,7 +134,12 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results):
     myCursor = mydb.cursor()
     for u in range(len(routes)):
         if len(results) > 1:
-            myCursor.execute(("SELECT Time from times WHERE StopId = '{}' AND RouteId = '{}' AND time > {} AND time < {} AND RouteId NOT IN {}").format(StartLocationId,routes[u], TimeStart, TimeEnd, str(results))) #Finds the time range
+            String = "("
+            for i in range(len(results)):
+                String = String + results[i]
+                String = String + ","
+            String = String + ")"
+            myCursor.execute(("SELECT Time from times WHERE StopId = '{}' AND RouteId = '{}' AND time > {} AND time < {} AND RouteId NOT IN {}").format(StartLocationId,routes[u], TimeStart, TimeEnd, str(String))) #Finds the time range
         elif len(results)==0:
             return()
         else:
