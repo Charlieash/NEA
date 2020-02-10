@@ -14,10 +14,9 @@ def ConnectToDatabase():
     return(mycursor)
 
 def format(variable):
-        variable = myCursor.fetchall()
-        variable = str(variable).replace(",","")
-        variable = str(variable).replace("(","")
-        variable = str(variable).replace(")","") 
+    variable = str(variable).replace(",","")
+    variable = str(variable).replace("(","")
+    variable = str(variable).replace(")","") 
     return(variable)
 def error(StartTime, StartLocation, EndLocation):
     StartLocation = StartLocation.strip()
@@ -145,7 +144,7 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId):
 
 
 
-def MultipleBusses(routes,TimeStart, TimeEnd, results):
+def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId):
     mydb = mysql.connector.connect(
         host="localhost",                    #connects to the database
         user="root",
@@ -156,14 +155,15 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results):
     List = routes
     Routes = []
     for i in range(len(List)):
-        myCursor.execute(("SELECT StopId FROM times WHERE RouteId = {}").format(List[i]))
+        myCursor.execute(("SELECT StopId FROM times WHERE RouteId = {} AND StopId != {}").format(List[i], StartLocationId))
         Stops = myCursor.fetchall()
         for u in range(len(Stops)):
-            StartLocationId=Stops[u]
-            Routes.append(Stops[u])
+            StartLocationId=Stops[u][0]
+            Routes.append([])
+            Routes[u].append(Stops[u][0])
             route = TimeRange(TimeStart, TimeEnd, StartLocationId)
             for o in range(len(Routes)):
-                if Routes[o]== Stops[u]:
+                if Routes[o]== Stops[u][0]:
                     Routes[o].append(route)
         for k in range(len(Routes)):
             routes = Routes[k]
@@ -185,4 +185,4 @@ StartLocationId = DataInput[4]
 EndLocationId = DataInput[5]
 routes = TimeRange(TimeStart, TimeEnd, StartLocationId)
 results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId)
-results = MultipleBusses(routes,TimeStart, TimeEnd, results)
+results = MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId)
