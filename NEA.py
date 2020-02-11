@@ -119,7 +119,6 @@ def TimeRange(TimeStart, TimeEnd, StartLocationId):
         Routes[i] = str(Routes[i]).replace("(","")
         Routes[i] = str(Routes[i]).replace(")","")
         Routes[i] = int(Routes[i])
-    print(Routes)
     return(Routes)
 
 
@@ -133,17 +132,13 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results):
         )
     myCursor = mydb.cursor()
     for u in range(len(routes)):
+        string =",".join('"%s"' % i for i in results)
         if len(results) > 1:
-            String = "("
-            for i in range(len(results)):
-                String = String + results[i]
-                String = String + ","
-            String = String + ")"
-            myCursor.execute(("SELECT Time from times WHERE StopId = '{}' AND RouteId = '{}' AND time > {} AND time < {} AND RouteId NOT IN {}").format(StartLocationId,routes[u], TimeStart, TimeEnd, str(String))) #Finds the time range
+            myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId NOT IN ({})").format(StartLocationId,routes[u], TimeStart, TimeEnd,string)) #Finds the time range
         elif len(results)==0:
             return()
         else:
-            myCursor.execute(("SELECT Time from times WHERE StopId = '{}' AND RouteId = '{}' AND time > {} AND time < {} AND RouteId != '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd, results[0]))
+            myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId != '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd, results[0]))
         Times = myCursor.fetchall()
         if len(Times)>0:
             Times = str(Times[0]).replace(",","")
@@ -184,7 +179,7 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
                 if Routes[o][0]== Stops[0]:
                     Routes[i].append(route)
         if len(Stops) > 0:
-            if len(Routes[i])> 1:
+            if len(results[(len(results)-1)])> 1:
                 routes = Routes[i][1]
                 routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results)
                 results.append(routesinTime)
@@ -195,7 +190,6 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
 DataInput = StartUp()
 #with open("It_works.txt","w") as Huh: #Test to see if php runs this script 
     #Huh.write("Thing")
-time.sleep(5)
 TimeStart = DataInput[2]
 TimeEnd = DataInput[3]
 EndLocation = DataInput[1]
@@ -203,8 +197,10 @@ StartLocation = DataInput[0]
 StartLocationId = DataInput[4]
 EndLocationId = DataInput[5]
 routes = TimeRange(TimeStart, TimeEnd, StartLocationId)
-results = ["69","420"]
+results = ["10000000000000000","1000000000000000000000"]
 results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId, results)
-Results = results 
-results.append(MultipleBusses(routes,TimeStart, TimeEnd, Results, StartLocationId, EndLocationId))
+Results= MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId)
+for i in range(len(Results)):
+    if Results[i] not in results:
+        results.append(Results[i])
 print(results)
