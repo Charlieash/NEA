@@ -3,32 +3,17 @@
 import time
 import mysql.connector
 from datetime import datetime
-def ConnectToDatabase():
-    mydb = mysql.connector.connect(
-        host="localhost",                    #connects to the database
-        user="root",
-        passwd="LucieLeia0804",
-        database="mydb",
-        )
-    mycursor = mydb.cursor()
-    return(mycursor)
 
 def format(variable):
     variable = str(variable).replace(",","")
     variable = str(variable).replace("(","")
     variable = str(variable).replace(")","") 
     return(variable)
-def error(StartTime, StartLocation, EndLocation):
+    
+def error(StartTime, StartLocation, EndLocation, myCursor):
     StartLocation = StartLocation.strip()
     EndLocation =EndLocation.strip()
     count = 0
-    mydb = mysql.connector.connect(
-        host="localhost",                    #connects to the database
-        user="root",
-        passwd="LucieLeia0804",
-        database="mydb",
-        )
-    myCursor = mydb.cursor()
     myCursor.execute("SELECT StopName FROM stop")
     Stops = myCursor.fetchall()
     
@@ -50,7 +35,7 @@ def ErrorCaught():
     return("error")
 
 
-def StartUp():
+def StartUp(myCursor):
     Info = []
     with open("data.txt","r") as File:
         for row in File:
@@ -61,7 +46,7 @@ def StartUp():
     if ":" not in StartTime:
         ErrorCaught()
     StartTime = StartTime.split(":")
-    Error = error(StartTime, StartLocation, EndLocation)
+    Error = error(StartTime, StartLocation, EndLocation, myCursor)
     if Error == "Error":
         ErrorCaught()
         return(Error)
@@ -74,22 +59,15 @@ def StartUp():
     EndTime = EndTime.rstrip()
     StartLocation = StartLocation.rstrip()
     EndLocation = EndLocation.rstrip()
-    Location = LocationId(StartLocation, EndLocation)
+    Location = LocationId(StartLocation, EndLocation, myCursor)
     StartLocationId= Location[0]
     EndLocationId = Location[1]
     return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
 
-def LocationId(StartLocation, EndLocation):
-    mydb = mysql.connector.connect(
-        host="localhost",                    #connects to the database
-        user="root",
-        passwd="LucieLeia0804",
-        database="mydb",
-        )
+def LocationId(StartLocation, EndLocation, myCursor):
     StartLocation = str(StartLocation).replace(",","")
     StartLocation = str(StartLocation).replace("(","")
     StartLocation = str(StartLocation).replace(")","") 
-    myCursor = mydb.cursor()
     myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(StartLocation))
     StartLocationId = myCursor.fetchall()
     StartLocationId = str(StartLocationId[0]).replace(",","")
@@ -104,14 +82,7 @@ def LocationId(StartLocation, EndLocation):
     EndLocationId = int(EndLocationId)
     return(StartLocationId, EndLocationId)
 
-def TimeRange(TimeStart, TimeEnd, StartLocationId):
-    mydb = mysql.connector.connect(
-        host="localhost",                    #connects to the database
-        user="root",
-        passwd="LucieLeia0804",
-        database="mydb",
-        )
-    myCursor = mydb.cursor()
+def TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor):
     myCursor.execute(("""SELECT Routeid FROM times WHERE Time > '%s' AND Time < '%s' AND StopID = '%s'""")%(TimeStart ,TimeEnd ,StartLocationId))  #searches the databases for all routes leaving the given stop within the time range
     Routes = myCursor.fetchall()
     for i in range(len(Routes)):
@@ -122,15 +93,8 @@ def TimeRange(TimeStart, TimeEnd, StartLocationId):
     return(Routes)
 
 
-def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results):
+def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor):
     RoutesInTime=[]
-    mydb = mysql.connector.connect(
-        host="localhost",                    #connects to the database
-        user="root",
-        passwd="LucieLeia0804",
-        database="mydb",
-        )
-    myCursor = mydb.cursor()
     for u in range(len(routes)):
         string =",".join('"%s"' % i for i in results)
         if len(results) > 1:
@@ -154,14 +118,7 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results):
 
 
 
-def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId):
-    mydb = mysql.connector.connect(
-        host="localhost",                    #connects to the database
-        user="root",
-        passwd="LucieLeia0804",
-        database="mydb",
-        )
-    myCursor = mydb.cursor()
+def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor):
     List = routes
     Routes = []
     for i in range(len(List)):
@@ -174,20 +131,26 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
             StartLocationId=Stops[u][0]
             Routes.append([])
             Routes[i].append(Stops[u][0])
-            route = TimeRange(TimeStart, TimeEnd, StartLocationId)
+            route = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
             for o in range(len(Routes)):
                 if Routes[o][0]== Stops[0]:
                     Routes[i].append(route)
         if len(Stops) > 0:
             if len(results[(len(results)-1)])> 1:
                 routes = Routes[i][1]
-                routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results)
+                routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)
                 results.append(routesinTime)
     return(results)
 
+mydb = mysql.connector.connect(
+    host="localhost",                    #connects to the database
+    user="root",
+    passwd="LucieLeia0804",
+    database="mydb",
+    )
+myCursor = mydb.cursor()
 
-
-DataInput = StartUp()
+DataInput = StartUp(myCursor)
 #with open("It_works.txt","w") as Huh: #Test to see if php runs this script 
     #Huh.write("Thing")
 TimeStart = DataInput[2]
@@ -196,10 +159,10 @@ EndLocation = DataInput[1]
 StartLocation = DataInput[0]
 StartLocationId = DataInput[4]
 EndLocationId = DataInput[5]
-routes = TimeRange(TimeStart, TimeEnd, StartLocationId)
+routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
 results = ["10000000000000000","1000000000000000000000"]
-results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId, results)
-Results= MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId)
+results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId, results, myCursor)
+Results= MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor)
 for i in range(len(Results)):
     if Results[i] not in results:
         results.append(Results[i])
