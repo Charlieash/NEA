@@ -160,7 +160,7 @@ StartLocation = DataInput[0]
 StartLocationId = DataInput[4]
 EndLocationId = DataInput[5]
 routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
-results = ["10000000000000000","1000000000000000000000"]
+results = ["100000000000000000000","1000000000000000000000"]
 results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId, results, myCursor)
 Results= MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor)
 for i in range(len(Results)):
