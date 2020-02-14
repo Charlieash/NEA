@@ -142,6 +142,21 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
                 results.append(routesinTime)
     return(results)
 
+def Interpret(results, myCursor, OGstartLocationID):
+    Times = ""
+    Stops = []
+    string =",".join('"%s"' % i for i in results)
+    myCursor.execute(("SELECT BusNum FROM route WHERE idRoute IN ({})").format(string))
+    variable = myCursor.fetchall()
+    for m in range(len(variable)):
+        Stops.append(format(variable[m]))
+    for g in range(len(results)):
+        myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g], OGstartLocationID))
+        variable = myCursor.fetchall()
+        Times = Times + (format(variable))
+    for k in range(len(Stops)):
+        print(Stops[k]+ ": "+ Times[k])
+
 mydb = mysql.connector.connect(
     host="localhost",                    #connects to the database
     user="root",
@@ -158,6 +173,7 @@ TimeEnd = DataInput[3]
 EndLocation = DataInput[1]
 StartLocation = DataInput[0]
 StartLocationId = DataInput[4]
+OGstartLocationID = StartLocationId
 EndLocationId = DataInput[5]
 routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
 results = ["100000000000000000000","1000000000000000000000"]
@@ -167,3 +183,5 @@ for i in range(len(Results)):
     if Results[i] not in results:
         results.append(Results[i])
 print(results)
+Interpret(results, myCursor, OGstartLocationID)
+
