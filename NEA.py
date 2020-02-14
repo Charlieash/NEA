@@ -143,7 +143,7 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
     return(results)
 
 def Interpret(results, myCursor, OGstartLocationID):
-    Times = ""
+    Times = []
     Stops = []
     string =",".join('"%s"' % i for i in results)
     myCursor.execute(("SELECT BusNum FROM route WHERE idRoute IN ({})").format(string))
@@ -153,8 +153,12 @@ def Interpret(results, myCursor, OGstartLocationID):
     for g in range(len(results)):
         myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g], OGstartLocationID))
         variable = myCursor.fetchall()
-        Times = Times + (format(variable))
+        Times.append(format(variable))
     for k in range(len(Stops)):
+        Times[k] = Times[k].replace("[", "")
+        Times[k] =Times[k].replace("]", "")
+        Times[k] =Times[k].replace("'", "")
+        Stops[k] =Stops[k].replace("'", "")
         print(Stops[k]+ ": "+ Times[k])
 
 mydb = mysql.connector.connect(
