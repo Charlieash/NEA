@@ -143,6 +143,7 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
     return(results)
 
 def Interpret(results, myCursor, OGstartLocationID):
+    Final = ""
     Times = []
     Stops = []
     string =",".join('"%s"' % i for i in results)
@@ -159,7 +160,10 @@ def Interpret(results, myCursor, OGstartLocationID):
         Times[k] =Times[k].replace("]", "")
         Times[k] =Times[k].replace("'", "")
         Stops[k] =Stops[k].replace("'", "")
-        print(Stops[k]+ ": "+ Times[k])
+        final = (Stops[k]+ " "+ Times[k])
+        Final = Final + final + "\n"
+    with open("data.txt","w") as File:
+        File.write(Final)
 
 mydb = mysql.connector.connect(
     host="localhost",                    #connects to the database
