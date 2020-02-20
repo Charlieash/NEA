@@ -161,7 +161,7 @@ def Interpret(results, myCursor, OGstartLocationID):
         Times[k] =Times[k].replace("'", "")
         Stops[k] =Stops[k].replace("'", "")
         final = (Stops[k]+ " "+ Times[k])
-        Final = Final + final + "\n"
+        Final = Final + final + " "
     with open("data.txt","w") as File:
         File.write(Final)
 

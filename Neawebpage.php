@@ -50,6 +50,7 @@
   {
       header("Location: Error.php");
   }
+  else{ header("Location: results.php");}
   }
   
   ?>
