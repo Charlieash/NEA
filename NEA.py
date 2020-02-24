@@ -36,33 +36,36 @@ def ErrorCaught():
 
 
 def StartUp(myCursor):
-    Info = []
-    with open("data.txt","r") as File:
-        for row in File:
-            Info.append(row)
-    StartLocation = Info[0] #Get the starting location for the bus
-    EndLocation = Info[1] #Get the end location for the bus
-    StartTime = Info[2] #Get the wanted arrival time
-    if ":" not in StartTime:
+    try:
+        Info = []
+        with open("data.txt","r") as File:
+            for row in File:
+                Info.append(row)
+        StartLocation = Info[0] #Get the starting location for the bus
+        EndLocation = Info[1] #Get the end location for the bus
+        StartTime = Info[2] #Get the wanted arrival time
+        if ":" not in StartTime:
+            ErrorCaught()
+        StartTime = StartTime.split(":")
+        Error = error(StartTime, StartLocation, EndLocation, myCursor)
+        if Error == "Error":
+            ErrorCaught()
+            return(Error)
+        EndTime = []
+        EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
+        EndTime.append(StartTime[1])
+        EndTime = str(0)+str(EndTime[0])+ ":" + str(EndTime[1])
+        StartTime = StartTime[0] +":"+ StartTime[1]
+        StartTime = StartTime.rstrip()
+        EndTime = EndTime.rstrip()
+        StartLocation = StartLocation.rstrip()
+        EndLocation = EndLocation.rstrip()
+        Location = LocationId(StartLocation, EndLocation, myCursor)
+        StartLocationId= Location[0]
+        EndLocationId = Location[1]
+        return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
+    except:
         ErrorCaught()
-    StartTime = StartTime.split(":")
-    Error = error(StartTime, StartLocation, EndLocation, myCursor)
-    if Error == "Error":
-        ErrorCaught()
-        return(Error)
-    EndTime = []
-    EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
-    EndTime.append(StartTime[1])
-    EndTime = str(0)+str(EndTime[0])+ ":" + str(EndTime[1])
-    StartTime = StartTime[0] +":"+ StartTime[1]
-    StartTime = StartTime.rstrip()
-    EndTime = EndTime.rstrip()
-    StartLocation = StartLocation.rstrip()
-    EndLocation = EndLocation.rstrip()
-    Location = LocationId(StartLocation, EndLocation, myCursor)
-    StartLocationId= Location[0]
-    EndLocationId = Location[1]
-    return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
 
 def LocationId(StartLocation, EndLocation, myCursor):
     StartLocation = str(StartLocation).replace(",","")
@@ -162,7 +165,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
         time = time.replace("'", "")
         time =time.replace("'", "")
         time = time.split(":")
-        TimeLen = TimeLen+(str(int(OGTimeStart[0]) - int(time[0]))+ str(int(OGTimeStart[1]) - int(time[1])))+ " "
+        TimeLen = TimeLen+"Hours: "+(str(-int(OGTimeStart[0]) + int(time[0]))+" Minutes: "+str(-int(OGTimeStart[1]) + int(time[1])))+ "\n"
     for k in range(len(Stops)):
         Times[k] = Times[k].replace("[", "")
         Times[k] =Times[k].replace("]", "")
@@ -172,7 +175,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
         Final = Final + final + " "
     with open("data.txt","w") as File:
         File.write(Final)
-    with open("times.txt, w") as File:
+    with open("times.txt", "w") as File:
         File.write(TimeLen)
 
 mydb = mysql.connector.connect(
