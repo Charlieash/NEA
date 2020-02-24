@@ -142,11 +142,12 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
                 results.append(routesinTime)
     return(results)
 
-def Interpret(results, myCursor, OGstartLocationID):
+def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
     Final = ""
     Times = []
     Stops = []
     string =",".join('"%s"' % i for i in results)
+    OGTimeStart = OGTimeStart.split(":")
     myCursor.execute(("SELECT BusNum FROM route WHERE idRoute IN ({})").format(string))
     variable = myCursor.fetchall()
     for m in range(len(variable)):
@@ -155,6 +156,8 @@ def Interpret(results, myCursor, OGstartLocationID):
         myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g], OGstartLocationID))
         variable = myCursor.fetchall()
         Times.append(format(variable))
+        time = Times[g][1].split(":")
+        TimeLen = (str(int(OGTimeStart[0]) - int(time[0]))+ str(int(OGTimeStart[1]) - int(time[1])))
     for k in range(len(Stops)):
         Times[k] = Times[k].replace("[", "")
         Times[k] =Times[k].replace("]", "")
@@ -164,6 +167,7 @@ def Interpret(results, myCursor, OGstartLocationID):
         Final = Final + final + " "
     with open("data.txt","w") as File:
         File.write(Final)
+        File.write(TimeLen)
 
 mydb = mysql.connector.connect(
     host="localhost",                    #connects to the database
@@ -181,6 +185,7 @@ TimeEnd = DataInput[3]
 EndLocation = DataInput[1]
 StartLocation = DataInput[0]
 StartLocationId = DataInput[4]
+OGTimeStart = TimeStart
 OGstartLocationID = StartLocationId
 EndLocationId = DataInput[5]
 routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
@@ -191,5 +196,5 @@ for i in range(len(Results)):
     if Results[i] not in results:
         results.append(Results[i])
 print(results)
-Interpret(results, myCursor, OGstartLocationID)
+Interpret(results, myCursor, OGstartLocationID, OGTimeStart)
 
