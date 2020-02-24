@@ -144,6 +144,7 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
 
 def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
     Final = ""
+    TimeLen = ""
     Times = []
     Stops = []
     string =",".join('"%s"' % i for i in results)
@@ -156,8 +157,12 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
         myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g], OGstartLocationID))
         variable = myCursor.fetchall()
         Times.append(format(variable))
-        time = Times[g][1].split(":")
-        TimeLen = (str(int(OGTimeStart[0]) - int(time[0]))+ str(int(OGTimeStart[1]) - int(time[1])))
+        time = Times[g].replace("[", "")
+        time =time.replace("]", "")
+        time = time.replace("'", "")
+        time =time.replace("'", "")
+        time = time.split(":")
+        TimeLen = TimeLen+(str(int(OGTimeStart[0]) - int(time[0]))+ str(int(OGTimeStart[1]) - int(time[1])))+ " "
     for k in range(len(Stops)):
         Times[k] = Times[k].replace("[", "")
         Times[k] =Times[k].replace("]", "")
@@ -167,6 +172,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
         Final = Final + final + " "
     with open("data.txt","w") as File:
         File.write(Final)
+    with open("times.txt, w") as File:
         File.write(TimeLen)
 
 mydb = mysql.connector.connect(
