@@ -36,13 +36,19 @@ def ErrorCaught():
 
 
 def StartUp(myCursor):
-    try:
+    #try:
         Info = []
         with open("data.txt","r") as File:
             for row in File:
                 Info.append(row)
-        StartLocation = Info[0] #Get the starting location for the bus
-        EndLocation = Info[1] #Get the end location for the bus
+        StartLocation = Info[0]
+        EndLocation = Info[1]
+        for k in range(len(Info[0])):
+            if StartLocation[k] == "_":
+                StartLocation = StartLocation.replace("_", " ") #Get the starting location for the bus
+        for j in range(len(Info[1])):
+            if EndLocation[j] == "_":
+                EndLocation = EndLocation.replace("_", " ") #Get the end location for the bus
         StartTime = Info[2] #Get the wanted arrival time
         if ":" not in StartTime:
             ErrorCaught()
@@ -64,8 +70,8 @@ def StartUp(myCursor):
         StartLocationId= Location[0]
         EndLocationId = Location[1]
         return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
-    except:
-        ErrorCaught()
+    #except:
+        #ErrorCaught()
 
 def LocationId(StartLocation, EndLocation, myCursor):
     StartLocation = str(StartLocation).replace(",","")

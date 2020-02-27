@@ -15,8 +15,6 @@ for i in range(len(Stops)):
     stop = str(stop).replace(")","")
     stop = str(stop).replace("'", "")
     stop = str(stop).replace("'", "")
-    if i != len(Stops)-1:
-        stops= stops + stop + ", " 
-    else:
-        stops = stops + stop
+    stop = str(stop).replace(" ", "_")
+    stops= stops + stop + ", " 
 print(stops)

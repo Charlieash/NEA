@@ -5,7 +5,7 @@
     </head>
     <body style="background-color: rgb(69, 42, 69)">
         <h1 style ="font-size: 900%; text-align: center; "> GET A BUS</h1>
-        <form  method = "POST" style ="text-align: center; font-size: 200%; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" size="300">
+        <form autocomplete="off" method = "POST" style ="text-align: center; font-size: 200%; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" size="300">
         Starting Location: <input name = "data" list="Bus Stops">
             <br></br> 
         Ending Location: <input  name = "data2" list="Bus Stops">
@@ -13,12 +13,7 @@
         Time: <input name = "data3" type = text>
         <br></br> 
             <input type = submit> 
-            <datalist id="Bus Stops">
-              <option value="Guildford Station">
-              <option value="Shalford">
-              <option value="High Path Road">
-              <option value="Merrow Chruch">
-              <option value="Bramley">
+            <datalist id="Bus Stops"><?php $place = ""; $read = exec("getBusStops.py"); for($x = 0; $x < (strlen($read)); $x++){if($read[$x] != ","){$place = $place.$read[$x];} else{echo("<option value=$place >"); $place = "";}}?>
             </datalist>
           </form>
     </body>
