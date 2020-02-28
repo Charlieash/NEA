@@ -1,0 +1,9 @@
+[{"idRoute":1, "BusNum":"53", "RouteLength":"29"},
+ {"idRoute":2, "BusNum":"53", "RouteLength":"42"},
+ {"idRoute":3, "BusNum":"53", "RouteLength":"48"},
+ {"idRoute":4, "BusNum":"53", "RouteLength":"50"},
+ {"idRoute":5, "BusNum":"53", "RouteLength":"37"},
+ {"idRoute":6, "BusNum":"53", "RouteLength":"40"},
+ {"idRoute":7, "BusNum":"53", "RouteLength":"33"},
+ {"idRoute":8, "BusNum":"479", "RouteLength":"90"},
+ {"idRoute":9, "BusNum":"53", "RouteLength":"45"}]

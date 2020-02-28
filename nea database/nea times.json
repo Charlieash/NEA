@@ -1,0 +1,10 @@
+[{"time":"06:40", "Routeid":1, "StopID":1, "PrimaryKey":1},
+ {"time":"06:47", "Routeid":1, "StopID":2, "PrimaryKey":2},
+ {"time":"07:15", "Routeid":2, "StopID":1, "PrimaryKey":3},
+ {"time":"07:26", "Routeid":2, "StopID":2, "PrimaryKey":4},
+ {"time":"07:50", "Routeid":4, "StopID":1, "PrimaryKey":5},
+ {"time":"08:02", "Routeid":4, "StopID":2, "PrimaryKey":6},
+ {"time":"08:05", "Routeid":8, "StopID":4, "PrimaryKey":7},
+ {"time":"07:50", "Routeid":8, "StopID":1, "PrimaryKey":8},
+ {"time":"07:13", "Routeid":9, "StopID":2, "PrimaryKey":9},
+ {"time":"07:26", "Routeid":9, "StopID":1, "PrimaryKey":10}]
