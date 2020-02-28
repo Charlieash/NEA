@@ -109,9 +109,9 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, 
         if len(results) > 1:
             myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId NOT IN ({})").format(StartLocationId,routes[u], TimeStart, TimeEnd,string)) #Finds the time range
         elif len(results)==0:
-            return()
+            myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd))
         else:
-            myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId != '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd, results[0]))
+            myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId != '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd, results[0][0]))
         Times = myCursor.fetchall()
         if len(Times)>0:
             Times = str(Times[0]).replace(",","")
@@ -127,7 +127,7 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, 
 
 
 
-def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor):
+def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor, OGstartLocationID):
     List = routes
     Routes = []
     for i in range(len(List)):
@@ -142,13 +142,25 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
             Routes[i].append(Stops[u][0])
             route = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
             for o in range(len(Routes)):
-                if Routes[o][0]== Stops[0]:
-                    Routes[i].append(route)
+                if Routes[o] != []:
+                    if Routes[o][0]== Stops[0]:
+                        Routes[i].append(route)
         if len(Stops) > 0:
-            if len(results[(len(results)-1)])> 1:
-                routes = Routes[i][1]
-                routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)
-                results.append(routesinTime)
+           # try:
+                if len(Routes[(len(Routes)-1)])> 1:
+                    routes = Routes[i][1]
+                    routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)
+                    if routesinTime != [] and routesinTime != ():
+                        results.append(routesinTime)
+                        EndLocationId = StartLocationId
+                        StartLocationId = OGstartLocationID
+                        routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
+                        routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)
+                        if routesinTime != [] and routesinTime != ():
+                            results.append(routesinTime)
+                    
+            #except:
+            #    print()
     return(results)
 
 def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
@@ -156,22 +168,30 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
     TimeLen = ""
     Times = []
     Stops = []
-    string =",".join('"%s"' % i for i in results)
+    string = ""
+    for a in range(len(results)):
+        if a == len(results)-1:
+            string = string + results[a][0]
+        else:
+            string = string + results[a][0]+", "
     OGTimeStart = OGTimeStart.split(":")
     myCursor.execute(("SELECT BusNum FROM route WHERE idRoute IN ({})").format(string))
     variable = myCursor.fetchall()
     for m in range(len(variable)):
         Stops.append(format(variable[m]))
     for g in range(len(results)):
-        myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g], OGstartLocationID))
-        variable = myCursor.fetchall()
-        Times.append(format(variable))
-        time = Times[g].replace("[", "")
-        time =time.replace("]", "")
-        time = time.replace("'", "")
-        time =time.replace("'", "")
-        time = time.split(":")
-        TimeLen = TimeLen+"Hours: "+(str(-int(OGTimeStart[0]) + int(time[0]))+" Minutes: "+str(-int(OGTimeStart[1]) + int(time[1])))+ "\n"
+        try:
+            myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g][0], OGstartLocationID))
+            variable = myCursor.fetchall()
+            Times.append(format(variable))
+            time = Times[g].replace("[", "")
+            time =time.replace("]", "")
+            time = time.replace("'", "")
+            time =time.replace("'", "")
+            time = time.split(":")
+            TimeLen = TimeLen+"Hours: "+(str(-int(OGTimeStart[0]) + int(time[0]))+" Minutes: "+str(-int(OGTimeStart[1]) + int(time[1])))+ "\n"
+        except:
+            print()
     for k in range(len(Stops)):
         Times[k] = Times[k].replace("[", "")
         Times[k] =Times[k].replace("]", "")
@@ -180,7 +200,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
         final = (Stops[k]+ " "+ Times[k])
         Final = Final + final + " "
     with open("data.txt","w") as File:
-        File.write(Final)
+        File.write(Final+ ",")
     with open("times.txt", "w") as File:
         File.write(TimeLen)
 
@@ -206,7 +226,7 @@ EndLocationId = DataInput[5]
 routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
 results = ["100000000000000000000","1000000000000000000000"]
 results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId, results, myCursor)
-Results= MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor)
+Results= MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor, OGstartLocationID)
 for i in range(len(Results)):
     if Results[i] not in results:
         results.append(Results[i])
