@@ -164,7 +164,8 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
     return(results)
 
 def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
-    Final = ""
+    Final = []
+    FInal =""
     TimeLen = ""
     Times = []
     Stops = []
@@ -197,10 +198,13 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
         Times[k] =Times[k].replace("]", "")
         Times[k] =Times[k].replace("'", "")
         Stops[k] =Stops[k].replace("'", "")
-        final = (Stops[k]+ " "+ Times[k])
-        Final = Final + final + " "
+        final = (Stops[k]+ " @ "+ Times[k])
+        Final.append(final + ", ")
+    Final.reverse()
+    for l in range(len(Final)):
+        FInal = FInal + Final[l]
     with open("data.txt","w") as File:
-        File.write(Final+ ",")
+        File.write(FInal)
     with open("times.txt", "w") as File:
         File.write(TimeLen)
 
