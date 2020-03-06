@@ -8,12 +8,16 @@
         <p style = "font-size: 400%; text-align: center;"><?php $data = strval(file_get_contents('data.txt'));$place = ""; for($x = 0; $x < (strlen($data)); $x++){if($data[$x] != ","){$place = $place.$data[$x];} else{ echo($place.'<br>'); $place = "";}} ?>  </p>
         <form method = "POST" style = "text-align:center;">
             <button class = "btn success" name = return style = "font-size: 220%;">Continue </button>
+        <form method = "POST" style = "text-align:center;">
+            <button class = "btn success" name = graph style = "font-size: 220%;">Graph </button>
 </form>
 </body>
 </html>
 <?php
-$read = exec("testing.py");
 if(isset($_POST['return']))
 {header("Location:Neawebpage.php");
+}
+if(isset($_POST['graph']))
+{exec("testing.py");
 }
 ?>
