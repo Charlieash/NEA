@@ -3,7 +3,7 @@
     <head>
         <title>GET A BUS</title>
     </head>
-    <body style="background-color: rgb(69, 42, 69)">
+    <body style="background-color: rgb(69, 42, 69)"> 
         <h1 style ="font-size: 900%; text-align: center; "> GET A BUS</h1>
         <form autocomplete="off" method = "POST" style ="text-align: center; font-size: 200%; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" size="300">
         Starting Location: <input name = "data" list="Bus Stops">
@@ -15,11 +15,14 @@
             <input type = submit> 
             <datalist id="Bus Stops"><?php $place = ""; $read = exec("getBusStops.py"); for($x = 0; $x < (strlen($read)); $x++){if($read[$x] != ","){$place = $place.$read[$x];} else{echo("<option value=$place >"); $place = "";}}?>
             </datalist>
-          </form>
+          </form><input type="image" src="bus.png" name="bus" class="btTxt submit" id="saveForm" method = "POST" />
     </body>
 </html>
 
 <?php
+if(isset($_POST['bus']))
+{header("Location: Bus_ai.php")
+}
   if(isset($_POST['data']))
   {
   $data=$_POST['data']."\r\n";
