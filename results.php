@@ -18,6 +18,6 @@ if(isset($_POST['return']))
 {header("Location:Neawebpage.php");
 }
 if(isset($_POST['graph']))
-{exec("testing.py");
+{exec("graphing.py");
 }
 ?>

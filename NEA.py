@@ -192,7 +192,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
             time =time.replace("'", "")
             time = time.split(":")
             minutes = minutes + ((-int(OGTimeStart[0]) + int(time[0]))*60)
-            TimeLen = str(minutes+(-int(OGTimeStart[1]) + int(time[1]))) +"\n"
+            TimeLen = TimeLen+ str(minutes+(-int(OGTimeStart[1]) + int(time[1]))) +"\n"
         except:
             print()
     for k in range(len(Stops)):
