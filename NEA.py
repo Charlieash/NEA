@@ -217,8 +217,6 @@ mydb = mysql.connector.connect(
 myCursor = mydb.cursor()
 
 DataInput = StartUp(myCursor)
-#with open("It_works.txt","w") as Huh: #Test to see if php runs this script 
-    #Huh.write("Thing")
 TimeStart = DataInput[2]
 TimeEnd = DataInput[3]
 EndLocation = DataInput[1]
@@ -236,4 +234,3 @@ for i in range(len(Results)):
         results.append(Results[i])
 print(results)
 Interpret(results, myCursor, OGstartLocationID, OGTimeStart)
-
