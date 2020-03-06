@@ -182,6 +182,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
         Stops.append(format(variable[m]))
     for g in range(len(results)):
         try:
+            minutes = 0
             myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g][0], OGstartLocationID))
             variable = myCursor.fetchall()
             Times.append(format(variable))
@@ -190,7 +191,8 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
             time = time.replace("'", "")
             time =time.replace("'", "")
             time = time.split(":")
-            TimeLen = TimeLen+"Hours: "+(str(-int(OGTimeStart[0]) + int(time[0]))+" Minutes: "+str(-int(OGTimeStart[1]) + int(time[1])))+ "\n"
+            minutes = minutes + ((-int(OGTimeStart[0]) + int(time[0]))*60)
+            TimeLen = str(minutes+(-int(OGTimeStart[1]) + int(time[1]))) +"\n"
         except:
             print()
     for k in range(len(Stops)):

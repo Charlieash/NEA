@@ -1,4 +1,7 @@
 import plotly.express as px
-df = px.data.iris()
-fig = px.scatter(df, x="sepal_width", y="sepal_length")
+import pandas as pd
+with open("times.txt", "r") as File:
+    data = File.read()
+wide_df = pd.DataFrame(dict(Data = data))
+fig = px.box(wide_df, y="Data")
 fig.show()

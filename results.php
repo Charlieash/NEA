@@ -12,6 +12,7 @@
 </body>
 </html>
 <?php
+$read = exec("testing.py");
 if(isset($_POST['return']))
 {header("Location:Neawebpage.php");
 }
