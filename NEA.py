@@ -168,7 +168,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
     FInal =""
     TimeLen = ""
     Times = []
-    Stops = []
+    BusNum = []
     string = ""
     for a in range(len(results)):
         if a == len(results)-1:
@@ -179,7 +179,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
     myCursor.execute(("SELECT BusNum FROM route WHERE idRoute IN ({})").format(string))
     variable = myCursor.fetchall()
     for m in range(len(variable)):
-        Stops.append(format(variable[m]))
+        BusNum.append(format(variable[m]))
     for g in range(len(results)):
         try:
             minutes = 0
@@ -195,12 +195,12 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
             TimeLen = TimeLen+ str(minutes+(-int(OGTimeStart[1]) + int(time[1]))) +"\n"
         except:
             print()
-    for k in range(len(Stops)):
+    for k in range(len(BusNum)):
         Times[k] = Times[k].replace("[", "")
         Times[k] =Times[k].replace("]", "")
         Times[k] =Times[k].replace("'", "")
-        Stops[k] =Stops[k].replace("'", "")
-        final = (Stops[k]+ " @ "+ Times[k])
+        BusNum[k] =BusNum[k].replace("'", "")
+        final = (BusNum[k]+ " @ "+ Times[k])
         Final.append(final + ", ")
     Final.reverse()
     for l in range(len(Final)):
