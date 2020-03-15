@@ -81,7 +81,7 @@ def LocationId(StartLocation, EndLocation, myCursor):
     StartLocationId = format(variable)
     StartLocationId = int(StartLocationId)
     myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(EndLocation))#gets the id of the ending location
-    varaible = myCursor.fetchall()
+    variable = myCursor.fetchall()
     EndLocationId = format(variable)
     EndLocationId = int(EndLocationId)
     return(StartLocationId, EndLocationId) #returns both ids
