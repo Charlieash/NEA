@@ -97,27 +97,26 @@ def TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor):
 
 
 def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor):
-    RoutesInTime=[]
+    RoutesInTime=[] #creates an empty list called routes in time
     for u in range(len(routes)):
-        string =",".join('"%s"' % i for i in results)
-        if len(results) > 1:
+        string =",".join('"%s"' % i for i in results) #loops through all the routes and creates a string with all of them seperated by commas
+        if len(results) > 1:#if the length of results is longer than one the string of results must be used to prevent repetition
             myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId NOT IN ({})").format(StartLocationId,routes[u], TimeStart, TimeEnd,string)) #Finds the time range
-        elif len(results)==0:
+        elif len(results)==0:#if there are no values in the list there is no need to prevent repetition
             myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd))
-        else:
+        else:#if there is 1 value in the list it cannot become and list but repetition of this singular value must be avoided
             myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId != '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd, results[0][0]))
         Times = myCursor.fetchall()
         if len(Times)>0:
-            Times = str(Times[0]).replace(",","")
-            Times = str(Times).replace("(","")
-            Times = str(Times).replace(")","") 
-            Times = str(Times).strip('\'')
+            variable = str(Times[0])
+            Times = format(varaible)
+            Times = Times.strip('\'')#formatting the Times
             myCursor.execute(("SELECT RouteId FROM times WHERE StopId = '{}' AND RouteId = '{}' AND time > '{}'").format(EndLocationId,routes[u],Times)) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
             variable = myCursor.fetchall() #appends the final product to a list
             if len(variable)>0:
                 RoutesIn = format(variable)
-                RoutesInTime.append(RoutesIn[1]) 
-    return(RoutesInTime) 
+                RoutesInTime.append(RoutesIn[1]) #appends the routes in the time range to a list
+    return(RoutesInTime) #list with all routes is returned
 
 
 
