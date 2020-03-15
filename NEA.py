@@ -4,16 +4,16 @@ import time
 import mysql.connector
 from datetime import datetime
 
-def format(variable):
-    variable = str(variable).replace(",","")
+def format(variable): #this function strips all brackets and commas from a string as that is the format they come out of the database which is difficult to process 
+    variable = str(variable).replace(",","") 
     variable = str(variable).replace("(","")
     variable = str(variable).replace(")","") 
     return(variable)
     
-def error(StartTime, StartLocation, EndLocation, myCursor):
+def error(StartTime, StartLocation, EndLocation, myCursor): #function checks the inputted data from the homepage to check whether it is usable 
     StartLocation = StartLocation.strip()
-    EndLocation =EndLocation.strip()
-    count = 0
+    EndLocation =EndLocation.strip() #strips /n etc from StartLocation and EndLocation
+    count = 0 #this variable will be used to show that there between StartLocation and EndLocation there are 2 valid bus stops
     myCursor.execute("SELECT StopName FROM stop")
     Stops = myCursor.fetchall()
     
@@ -21,26 +21,26 @@ def error(StartTime, StartLocation, EndLocation, myCursor):
         if StartLocation == (Stops[i][0]) or EndLocation ==(Stops[i][0]):
             count = count+1
     if count != 2:
-        return("Error")
+        return("Error") #if there are more or less than 2 valid bus stops there has been a problem and hence there is an error 
     try:
-        errorCatch = int(StartTime[0]) + int(StartTime[1])
-        if int(StartTime[0]) > 23 or int(StartTime[0]) < 00 or int(StartTime[1]) > 59 or int(StartTime[1])<00:
+        errorCatch = int(StartTime[0]) + int(StartTime[1]) #attempts to convert each part of the inputted time to an integer, if this fails they are not numbers hence in the incorrect format
+        if int(StartTime[0]) > 23 or int(StartTime[0]) < 00 or int(StartTime[1]) > 59 or int(StartTime[1])<00: #makes sure the times are within the possible region for time formats
             return("Error")
     except:
         return("Error")
 
 
 def ErrorCaught():
-    print("Error")
+    print("Error") #by printing "error" the php can read it and display the error page 
     return("error")
 
 
 def StartUp(myCursor):
-    #try:
+    try:
         Info = []
-        with open("data.txt","r") as File:
+        with open("data.txt","r") as File: #gets the input data from the homepage which was saved in "data.txt"
             for row in File:
-                Info.append(row)
+                Info.append(row)#inputs said data to a 2d list
         StartLocation = Info[0]
         EndLocation = Info[1]
         for k in range(len(Info[0])):
@@ -70,8 +70,8 @@ def StartUp(myCursor):
         StartLocationId= Location[0]
         EndLocationId = Location[1]
         return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
-    #except:
-        #ErrorCaught()
+    except:
+        ErrorCaught() #if this process fails there has been an error 
 
 def LocationId(StartLocation, EndLocation, myCursor):
     StartLocation = str(StartLocation).replace(",","")
