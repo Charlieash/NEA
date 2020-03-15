@@ -41,32 +41,32 @@ def StartUp(myCursor):
         with open("data.txt","r") as File: #gets the input data from the homepage which was saved in "data.txt"
             for row in File:
                 Info.append(row)#inputs said data to a 2d list
-        StartLocation = Info[0]
-        EndLocation = Info[1]
+        StartLocation = Info[0]#gets starting location
+        EndLocation = Info[1]#gets ending location
         for k in range(len(Info[0])):
             if StartLocation[k] == "_":
-                StartLocation = StartLocation.replace("_", " ") #Get the starting location for the bus
+                StartLocation = StartLocation.replace("_", " ") #the bus stop are displayed as single strings seperated by underscores which have to be removed so that they can be processed
         for j in range(len(Info[1])):
             if EndLocation[j] == "_":
-                EndLocation = EndLocation.replace("_", " ") #Get the end location for the bus
+                EndLocation = EndLocation.replace("_", " ") #same thing as what happens to StartLocation
         StartTime = Info[2] #Get the wanted arrival time
-        if ":" not in StartTime:
-            ErrorCaught()
-        StartTime = StartTime.split(":")
+        if ":" not in StartTime: #Starttime should be in the format int:int so if there is no : it is in an incorrect format
+            ErrorCaught() 
+        StartTime = StartTime.split(":") #splits StartTime into two seperate integers so that they can be processed seperately 
         Error = error(StartTime, StartLocation, EndLocation, myCursor)
         if Error == "Error":
             ErrorCaught()
-            return(Error)
+            return(Error) #breaks the process
         EndTime = []
         EndTime.append(int(StartTime[0])+1) #no one wants to wait for a bus for longer than an hour
-        EndTime.append(StartTime[1])
-        EndTime = str(0)+str(EndTime[0])+ ":" + str(EndTime[1])
-        StartTime = StartTime[0] +":"+ StartTime[1]
-        StartTime = StartTime.rstrip()
+        EndTime.append(StartTime[1])#end time is just starttime with an extra hour
+        EndTime = str(0)+str(EndTime[0])+ ":" + str(EndTime[1]) #puts EndTime in the correct format
+        StartTime = StartTime[0] +":"+ StartTime[1] #reformats StartTime
+        StartTime = StartTime.rstrip() #removes and /n s etc from StartTime, Endtime, StartLocation and EndLocation
         EndTime = EndTime.rstrip()
         StartLocation = StartLocation.rstrip()
         EndLocation = EndLocation.rstrip()
-        Location = LocationId(StartLocation, EndLocation, myCursor)
+        Location = LocationId(StartLocation, EndLocation, myCursor) #this function finds the Id of the Starting Bus stop and the Ending Bus stop
         StartLocationId= Location[0]
         EndLocationId = Location[1]
         return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
@@ -74,32 +74,26 @@ def StartUp(myCursor):
         ErrorCaught() #if this process fails there has been an error 
 
 def LocationId(StartLocation, EndLocation, myCursor):
-    StartLocation = str(StartLocation).replace(",","")
-    StartLocation = str(StartLocation).replace("(","")
-    StartLocation = str(StartLocation).replace(")","") 
-    myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(StartLocation))
-    StartLocationId = myCursor.fetchall()
-    StartLocationId = str(StartLocationId[0]).replace(",","")
-    StartLocationId = str(StartLocationId).replace("(","")
-    StartLocationId = str(StartLocationId).replace(")","") 
+    variable = StartLocation
+    StartLocation = format(variable)
+    myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(StartLocation)) #gets the id of the starting location
+    variable = myCursor.fetchall()
+    StartLocationId = format(variable)
     StartLocationId = int(StartLocationId)
-    myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(EndLocation))
-    EndLocationId = myCursor.fetchall()
-    EndLocationId = str(EndLocationId[0]).replace(",","")
-    EndLocationId = str(EndLocationId).replace("(","")
-    EndLocationId = str(EndLocationId).replace(")","") 
+    myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(EndLocation))#gets the id of the ending location
+    varaible = myCursor.fetchall()
+    EndLocationId = format(variable)
     EndLocationId = int(EndLocationId)
-    return(StartLocationId, EndLocationId)
+    return(StartLocationId, EndLocationId) #returns both ids
 
 def TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor):
     myCursor.execute(("""SELECT Routeid FROM times WHERE Time > '%s' AND Time < '%s' AND StopID = '%s'""")%(TimeStart ,TimeEnd ,StartLocationId))  #searches the databases for all routes leaving the given stop within the time range
-    Routes = myCursor.fetchall()
+    Routes = myCursor.fetchall() #fetches all the routes as a list
     for i in range(len(Routes)):
-        Routes[i] = str(Routes[i][0]).replace(",","")
-        Routes[i] = str(Routes[i]).replace("(","")
-        Routes[i] = str(Routes[i]).replace(")","")
+        variable = str(Routes[i])
+        Routes[i] = format(variable) #formats each route appropriately 
         Routes[i] = int(Routes[i])
-    return(Routes)
+    return(Routes)#returns the list of routes
 
 
 def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor):
