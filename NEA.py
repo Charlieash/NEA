@@ -109,7 +109,7 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, 
         Times = myCursor.fetchall()
         if len(Times)>0:
             variable = str(Times[0])
-            Times = format(varaible)
+            Times = format(variable)
             Times = Times.strip('\'')#formatting the Times
             myCursor.execute(("SELECT RouteId FROM times WHERE StopId = '{}' AND RouteId = '{}' AND time > '{}'").format(EndLocationId,routes[u],Times)) #selects the routes from all routes leaving the bus stop in the time range which end at the wanted bus stop
             variable = myCursor.fetchall() #appends the final product to a list
@@ -121,59 +121,55 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, 
 
 
 def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor, OGstartLocationID):
-    List = routes
-    Routes = []
-    for i in range(len(List)):
-        myCursor.execute(("SELECT StopId FROM times WHERE RouteId = '{}' AND StopId != '{}'").format(List[i], StartLocationId))
+    List = routes #creates a backup of routes 
+    Routes = [] #creates a new empty list called "Routes"
+    for i in range(len(List)):#loops through the length of List which is the length of routes
+        myCursor.execute(("SELECT StopId FROM times WHERE RouteId = '{}' AND StopId != '{}'").format(List[i], StartLocationId))#fetches all ids of stops where the routeid is equal to the current route and the stop id is not equal to a stop that has already been visited 
         Stops = myCursor.fetchall()
-        for a in range(len(Stops)):
+        for a in range(len(Stops)):#formats all the fetched stops
             variable = Stops[a]
             Stops[a] = format(variable)
-        for u in range(len(Stops)):
-            StartLocationId=Stops[u][0]
-            Routes.append([])
-            Routes[i].append(Stops[u][0])
-            route = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
-            for o in range(len(Routes)):
-                if Routes[o] != []:
-                    if Routes[o][0]== Stops[0]:
-                        Routes[i].append(route)
-        if len(Stops) > 0:
-           # try:
-                if len(Routes[(len(Routes)-1)])> 1:
-                    routes = Routes[i][1]
-                    routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)
-                    if routesinTime != [] and routesinTime != ():
-                        results.append(routesinTime)
+        for u in range(len(Stops)):#loops through the list of stops 
+            StartLocationId=Stops[u][0] #makes the new starting location equal to the current stop in the loop
+            Routes.append([]) #formats routes so that new values can be added 
+            Routes[i].append(Stops[u][0])#appends the current stops to the list as a reference 
+            route = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor) #finds all the routes in the appropriate time range from the new stop to the final stop
+            for o in range(len(Routes)): #loops through all routes going off of the current stop within the time range
+                if Routes[o] != []:#checks whether the route is blank
+                    if Routes[o][0]== Stops[0]:#checks whether the stop is in routes 
+                        Routes[i].append(route)#appends the route the first route to create a series of connected routes
+        if len(Stops) > 0:#checks whether stops is empty 
+                if len(Routes[(len(Routes)-1)])> 1:#checks whether the length of the final value of routes is greater than 1
+                    routes = Routes[i][1] #sets routes to the routes next to the first route
+                    routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)#performs onebus with the new data
+                    if routesinTime != [] and routesinTime != ():#checks whether rouesinTime is empty
+                        results.append(routesinTime)#if not empty the results from onebus are appended to the results 
                         EndLocationId = StartLocationId
                         StartLocationId = OGstartLocationID
-                        routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
+                        routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)#finds the correct route from the original bus stop to the intermediate bus stop
                         routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)
-                        if routesinTime != [] and routesinTime != ():
+                        if routesinTime != [] and routesinTime != ():#checks whether the search came up empty
                             results.append(routesinTime)
-                    
-            #except:
-            #    print()
-    return(results)
+    return(results)#returns all the results 
 
-def Interpret(results, myCursor, OGstartLocationID, OGTimeStart):
+def Interpret(results, myCursor, OGstartLocationID, OGTimeStart): #this function interprets all the results so they can be displayed to the end user
     Final = []
     FInal =""
     TimeLen = ""
-    Times = []
+    Times = [] #creates a bunch of empty variable that are used in the interpretation
     BusNum = []
     string = ""
-    for a in range(len(results)):
+    for a in range(len(results)):#loops through the length of the results  
         if a == len(results)-1:
             string = string + results[a][0]
         else:
-            string = string + results[a][0]+", "
-    OGTimeStart = OGTimeStart.split(":")
-    myCursor.execute(("SELECT BusNum FROM route WHERE idRoute IN ({})").format(string))
+            string = string + results[a][0]+", " #converts a list to a string with the values seperated by commas
+    OGTimeStart = OGTimeStart.split(":")#splits the original start time at the colon into two integers 
+    myCursor.execute(("SELECT BusNum FROM route WHERE idRoute IN ({})").format(string))#gets the bus number assosiated with the route
     variable = myCursor.fetchall()
     for m in range(len(variable)):
-        BusNum.append(format(variable[m]))
-    for g in range(len(results)):
+        BusNum.append(format(variable[m]))#formats the bus numbers and appends them to a list
+    for g in range(len(results)):#loops through the length of the results 
         try:
             minutes = 0
             myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g][0], OGstartLocationID))
