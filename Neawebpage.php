@@ -15,7 +15,6 @@
             <input type = submit> 
             <datalist id="Bus Stops"><?php $place = ""; $read = exec("getBusStops.py"); for($x = 0; $x < (strlen($read)); $x++){if($read[$x] != ","){$place = $place.$read[$x];} else{echo("<option value=$place >"); $place = "";}}?>
             </datalist>
-          </form><input type="image" src="bus.png" name="bus" class="btTxt submit" id="saveForm" method = "POST" />
     </body>
 </html>
 
