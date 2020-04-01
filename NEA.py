@@ -69,7 +69,7 @@ def StartUp(myCursor):
         Location = LocationId(StartLocation, EndLocation, myCursor) #this function finds the Id of the Starting Bus stop and the Ending Bus stop
         StartLocationId= Location[0]
         EndLocationId = Location[1]
-        return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
+        return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)#returns various 
     except:
         ErrorCaught() #if this process fails there has been an error 
 
