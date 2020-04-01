@@ -15,6 +15,7 @@
             <input type = submit> 
             <datalist id="Bus Stops"><?php $place = ""; $read = exec("getBusStops.py"); for($x = 0; $x < (strlen($read)); $x++){if($read[$x] != ","){$place = $place.$read[$x];} else{echo("<option value=$place >"); $place = "";}}?>
             </datalist>
+          </form>
     </body>
 </html>
 
