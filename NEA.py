@@ -77,11 +77,11 @@ def LocationId(StartLocation, EndLocation, myCursor):
     StartLocation = format(variable)
     myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(StartLocation)) #gets the id of the starting location
     variable = myCursor.fetchall()
-    StartLocationId = format(variable)
+    StartLocationId = format(variable[0])
     StartLocationId = int(StartLocationId)
     myCursor.execute(("SELECT idStop FROM stop WHERE StopName = '%s'")%(EndLocation))#gets the id of the ending location
     variable = myCursor.fetchall()
-    EndLocationId = format(variable)
+    EndLocationId = format(variable[0])
     EndLocationId = int(EndLocationId)
     return(StartLocationId, EndLocationId) #returns both ids
 
@@ -202,7 +202,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart): #this function
 mydb = mysql.connector.connect(
     host="localhost",             #connects to the database
     user="root",
-    passwd="password",
+    passwd="LucieLeia0804",
     database="mydb",
     )
 myCursor = mydb.cursor() #defines the reference to the instance 
