@@ -17,4 +17,5 @@ for i in range(len(Stops)):
     stop = str(stop).replace("'", "")
     stop = str(stop).replace(" ", "_")
     stops= stops + stop + ", " 
+    #formats all the stops 
 print(stops)

@@ -1,6 +1,7 @@
 #NEA
 import time
 import mysql.connector
+from datetime import datetime
 
 def format(variable): #this function strips all brackets and commas from a string as that is the format they come out of the database which is difficult to process 
     variable = str(variable).replace(",","") 
@@ -67,7 +68,7 @@ def StartUp(myCursor):
         Location = LocationId(StartLocation, EndLocation, myCursor) #this function finds the Id of the Starting Bus stop and the Ending Bus stop
         StartLocationId= Location[0]
         EndLocationId = Location[1]
-        return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)#returns various 
+        return(StartLocation, EndLocation, StartTime, EndTime, StartLocationId, EndLocationId)
     except:
         ErrorCaught() #if this process fails there has been an error 
 

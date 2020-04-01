@@ -15,11 +15,12 @@
             <input type = submit> 
             <datalist id="Bus Stops"><?php $place = ""; $read = exec("getBusStops.py"); for($x = 0; $x < (strlen($read)); $x++){if($read[$x] != ","){$place = $place.$read[$x];} else{echo("<option value=$place >"); $place = "";}}?>
             </datalist>
-          </form>
+          </form><input type="image" src="bus.png" name="bus" class="btTxt submit" id="saveForm" method = "POST" />
     </body>
 </html>
 
 <?php
+
   if(isset($_POST['data']))
   {
   $data=$_POST['data']."\r\n";
@@ -36,7 +37,7 @@
   }
   if(isset($_POST['data3']))
   {
-  $data=$_POST['data3']."\r\n";
+  $data=$_POST['data3']."\r\n"; 
   $fp = fopen('data.txt', 'a');
   fwrite($fp, $data);
   fclose($fp);
