@@ -101,7 +101,7 @@ def OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, 
     for u in range(len(routes)):
         string =",".join('"%s"' % i for i in results) #loops through all the routes and creates a string with all of them seperated by commas
         if len(results) > 1:#if the length of results is longer than one the string of results must be used to prevent repetition
-            myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId NOT IN ({})").format(StartLocationId,routes[u], TimeStart, TimeEnd,string)) #Finds the time range
+            myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}' AND RouteId NOT IN ({})").format(StartLocationId,routes[u], TimeStart, TimeEnd,string)) #Finds the routes in the time range
         elif len(results)==0:#if there are no values in the list there is no need to prevent repetition
             myCursor.execute(("SELECT time from times WHERE StopId = '{}' AND Routeid = '{}' AND time > '{}' AND time < '{}'").format(StartLocationId,routes[u], TimeStart, TimeEnd))
         else:#if there is 1 value in the list it cannot become and list but repetition of this singular value must be avoided
@@ -166,12 +166,12 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart): #this function
             string = string + results[a][0]+", " #converts a list to a string with the values seperated by commas
     OGTimeStart = OGTimeStart.split(":")#splits the original start time at the colon into two integers 
     myCursor.execute(("SELECT BusNum FROM route WHERE idRoute IN ({})").format(string))#gets the bus number assosiated with the route
-    variable = myCursor.fetchall()
-    for m in range(len(variable)):
+    variable = myCursor.fetchall()#defines the result as the variable "variable"
+    for m in range(len(variable)):#loops through the length of the variable 
         BusNum.append(format(variable[m]))#formats the bus numbers and appends them to a list
     for g in range(len(results)):#loops through the length of the results 
-        try:
-            minutes = 0
+        try:#try except error testing 
+            minutes = 0 #defines the variable minutes
             myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g][0], OGstartLocationID))
             variable = myCursor.fetchall()
             Times.append(format(variable))
