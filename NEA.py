@@ -173,55 +173,56 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart): #this function
         try:#try except error testing 
             minutes = 0 #defines the variable minutes
             myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g][0], OGstartLocationID))
-            variable = myCursor.fetchall()
-            Times.append(format(variable))
+            #selects the time where the routeid is equal to the current result and the stop id is equal to the original startlocation id 
+            variable = myCursor.fetchall() #defines the result as "variable"
+            Times.append(format(variable))#formats the fetched result and appends it to times
             time = Times[g].replace("[", "")
-            time =time.replace("]", "")
+            time =time.replace("]", "") #formats the current time 
             time = time.replace("'", "")
             time =time.replace("'", "")
             time = time.split(":")
-            minutes = minutes + ((-int(OGTimeStart[0]) + int(time[0]))*60)
-            TimeLen = TimeLen+ str(minutes+(-int(OGTimeStart[1]) + int(time[1]))) +"\n"
+            minutes = minutes + ((-int(OGTimeStart[0]) + int(time[0]))*60)#converts the hours to minutes 
+            TimeLen = TimeLen+ str(minutes+(-int(OGTimeStart[1]) + int(time[1]))) +"\n"#calculates the number of minutes in the journey
         except:
-            print()
-    for k in range(len(BusNum)):
+            print() #if there is an exception that means there were no times so above code not applicable 
+    for k in range(len(BusNum)):#loops through BusNum
         Times[k] = Times[k].replace("[", "")
         Times[k] =Times[k].replace("]", "")
-        Times[k] =Times[k].replace("'", "")
+        Times[k] =Times[k].replace("'", "")#removes additional useless punctuation 
         BusNum[k] =BusNum[k].replace("'", "")
         final = (BusNum[k]+ " @ "+ Times[k])
-        Final.append(final + ", ")
-    Final.reverse()
+        Final.append(final + ", ") #formats text into a readable format
+    Final.reverse() 
     for l in range(len(Final)):
-        FInal = FInal + Final[l]
+        FInal = FInal + Final[l] #combines all the strings into one coherent string 
     with open("data.txt","w") as File:
-        File.write(FInal)
+        File.write(FInal)#writes the final product to a text file 
     with open("times.txt", "w") as File:
-        File.write(TimeLen)
+        File.write(TimeLen)#writes the time taken to a text file 
 
 mydb = mysql.connector.connect(
-    host="localhost",                    #connects to the database
+    host="localhost",             #connects to the database
     user="root",
     passwd="LucieLeia0804",
     database="mydb",
     )
-myCursor = mydb.cursor()
+myCursor = mydb.cursor() #defines the reference to the instance 
 
-DataInput = StartUp(myCursor)
+DataInput = StartUp(myCursor) #creates a list of the initial variables 
 TimeStart = DataInput[2]
 TimeEnd = DataInput[3]
-EndLocation = DataInput[1]
+EndLocation = DataInput[1] #defines each variable 
 StartLocation = DataInput[0]
 StartLocationId = DataInput[4]
-OGTimeStart = TimeStart
-OGstartLocationID = StartLocationId
+OGTimeStart = TimeStart #saves a backup of TimeStart
+OGstartLocationID = StartLocationId #saves a backup of StartLocationId
 EndLocationId = DataInput[5]
-routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)
-results = ["100000000000000000000","1000000000000000000000"]
-results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId, results, myCursor)
+routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor) #runs the function TimeRange
+results = ["100000000000000000000","1000000000000000000000"] #defines results as two rediculously large numbers so they wont be recognised 
+results = OneBus(routes,TimeStart, TimeEnd, StartLocationId, EndLocationId, results, myCursor) #runs the function onebus
 Results= MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocationId, myCursor, OGstartLocationID)
+#runs the function MultipleBusses
 for i in range(len(Results)):
-    if Results[i] not in results:
+    if Results[i] not in results:#loops through results and deleted all repetition
         results.append(Results[i])
-print(results)
-Interpret(results, myCursor, OGstartLocationID, OGTimeStart)
+Interpret(results, myCursor, OGstartLocationID, OGTimeStart)#runs the function Interpret
