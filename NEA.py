@@ -202,7 +202,7 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart): #this function
 mydb = mysql.connector.connect(
     host="localhost",             #connects to the database
     user="root",
-    passwd="LucieLeia0804",
+    passwd="password",
     database="mydb",
     )
 myCursor = mydb.cursor() #defines the reference to the instance 

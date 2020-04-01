@@ -3,7 +3,7 @@ stops = ""
 mydb = mysql.connector.connect(
     host="localhost",                    #connects to the database
     user="root",
-    passwd="LucieLeia0804",
+    passwd="password",
     database="mydb",
     )
 myCursor = mydb.cursor()
