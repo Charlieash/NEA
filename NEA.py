@@ -2,7 +2,6 @@
 #First draft for finding all possible bus routes between any two points
 import time
 import mysql.connector
-from datetime import datetime
 
 def format(variable): #this function strips all brackets and commas from a string as that is the format they come out of the database which is difficult to process 
     variable = str(variable).replace(",","") 
