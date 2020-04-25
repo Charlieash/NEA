@@ -13,7 +13,7 @@
         Time: <input name = "data3" type = text>
         <br></br> 
             <input type = submit> 
-            <datalist id="Bus Stops"><?php $place = ""; $read = exec("Backend/getBusStops.py"); for($x = 0; $x < (strlen($read)); $x++){if($read[$x] != ","){$place = $place.$read[$x];} else{echo("<option value=$place >"); $place = "";}}?>
+            <datalist id="Bus Stops"><?php $place = ""; $read = exec("Backend\getBusStops.py"); for($x = 0; $x < (strlen($read)); $x++){if($read[$x] != ","){$place = $place.$read[$x];} else{echo("<option value=$place >"); $place = "";}}?>
             </datalist>
           </form>
     </body>
@@ -41,7 +41,7 @@
   $fp = fopen('data.txt', 'a');
   fwrite($fp, $data);
   fclose($fp);
-  $read = exec("Backend/NEA.py");
+  $read = exec("Backend\NEA.py");
   if($read == "Error")
   {
       header("Location: Error.php");
