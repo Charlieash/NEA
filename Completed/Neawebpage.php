@@ -24,21 +24,21 @@
   if(isset($_POST['data']))
   {
   $data=$_POST['data']."\r\n";
-  $fp = fopen('data.txt', 'w');
+  $fp = fopen('Backend\Data_Transfer\data.txt', 'w');
   fwrite($fp, $data);
   fclose($fp);
   }
   if(isset($_POST['data2']))
   {
   $data=$_POST['data2']."\r\n";
-  $fp = fopen('data.txt', 'a');
+  $fp = fopen('Backend\Data_Transfer\data.txt', 'a');
   fwrite($fp, $data);
   fclose($fp);
   }
   if(isset($_POST['data3']))
   {
   $data=$_POST['data3']."\r\n"; 
-  $fp = fopen('data.txt', 'a');
+  $fp = fopen('Backend\Data_Transfer\data.txt', 'a');
   fwrite($fp, $data);
   fclose($fp);
   $read = exec("Backend\NEA.py");

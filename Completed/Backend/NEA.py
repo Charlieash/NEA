@@ -1,5 +1,6 @@
 #NEA
 import time
+import os
 import mysql.connector
 from datetime import datetime
 
@@ -37,7 +38,9 @@ def ErrorCaught():
 def StartUp(myCursor):
     try:
         Info = []
-        with open("data.txt","r") as File: #gets the input data from the homepage which was saved in "data.txt"
+        cur_path = os.path.dirname(__file__)
+        new_path = cur_path + "\\Data_Transfer\\data.txt"
+        with open(new_path,"r") as File: #gets the input data from the homepage which was saved in "data.txt"
             for row in File:
                 Info.append(row)#inputs said data to a 2d list
         StartLocation = Info[0]#gets starting location
@@ -135,20 +138,20 @@ def MultipleBusses(routes,TimeStart, TimeEnd, results, StartLocationId, EndLocat
             route = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor) #finds all the routes in the appropriate time range from the new stop to the final stop
             for o in range(len(Routes)): #loops through all routes going off of the current stop within the time range
                 if Routes[o] != []:#checks whether the route is blank
-                    if Routes[o][0]== Stops[0]:#checks whether the stop is in routes 
+                    if Routes[o][0] in Stops:#checks whether the stop is in routes 
                         Routes[i].append(route)#appends the route the first route to create a series of connected routes
         if len(Stops) > 0:#checks whether stops is empty 
-                if len(Routes[(len(Routes)-1)])> 1:#checks whether the length of the final value of routes is greater than 1
+                if len(Routes[(len(Routes)-2)])> 1:#checks whether the length of the final value of routes is greater than 1
                     routes = Routes[i][1] #sets routes to the routes next to the first route
-                    routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)#performs onebus with the new data
-                    if routesinTime != [] and routesinTime != ():#checks whether rouesinTime is empty
-                        results.append(routesinTime)#if not empty the results from onebus are appended to the results 
-                        EndLocationId = StartLocationId
-                        StartLocationId = OGstartLocationID
-                        routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)#finds the correct route from the original bus stop to the intermediate bus stop
-                        routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)
-                        if routesinTime != [] and routesinTime != ():#checks whether the search came up empty
-                            results.append(routesinTime)
+                routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)#performs onebus with the new data
+                if routesinTime != [] and routesinTime != ():#checks whether rouesinTime is empty
+                    results.append(routesinTime[0]+":"+StartLocationId)#if not empty the results from onebus are appended to the results 
+                    EndLocationId = StartLocationId
+                    StartLocationId = OGstartLocationID
+                    routes = TimeRange(TimeStart, TimeEnd, StartLocationId, myCursor)#finds the correct route from the original bus stop to the intermediate bus stop
+                    routesinTime= OneBus(routes,TimeStart, TimeEnd, StartLocationId , EndLocationId, results, myCursor)
+                    if routesinTime != [] and routesinTime != ():#checks whether the search came up empty
+                        results.append(routesinTime[0]+":"+str(StartLocationId))
     return(results)#returns all the results 
 
 def Interpret(results, myCursor, OGstartLocationID, OGTimeStart): #this function interprets all the results so they can be displayed to the end user
@@ -171,7 +174,10 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart): #this function
     for g in range(len(results)):#loops through the length of the results 
         try:#try except error testing 
             minutes = 0 #defines the variable minutes
-            myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g][0], OGstartLocationID))
+            try:
+                myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g][0], results[g][2]))
+            except:
+                myCursor.execute(("SELECT time FROM times WHERE Routeid = {} AND StopID = {}").format(results[g], OGstartLocationID))
             #selects the time where the routeid is equal to the current result and the stop id is equal to the original startlocation id 
             variable = myCursor.fetchall() #defines the result as "variable"
             Times.append(format(variable))#formats the fetched result and appends it to times
@@ -194,9 +200,12 @@ def Interpret(results, myCursor, OGstartLocationID, OGTimeStart): #this function
     Final.reverse() 
     for l in range(len(Final)):
         FInal = FInal + Final[l] #combines all the strings into one coherent string 
-    with open("data.txt","w") as File:
+    cur_path = os.path.dirname(__file__)
+    new_path = cur_path + "\\Data_Transfer\\data.txt"
+    with open(new_path,"w") as File:
         File.write(FInal)#writes the final product to a text file 
-    with open("times.txt", "w") as File:
+    new_path = cur_path + "\\Data_Transfer\\times.txt"
+    with open(new_path, "w") as File:
         File.write(TimeLen)#writes the time taken to a text file 
 
 mydb = mysql.connector.connect(
